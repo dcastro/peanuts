@@ -1,0 +1,22 @@
+{
+  "name": "play",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/index.js"
+  },
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "dat-gui": "https://github.com/dataarts/dat.gui.git",
+    "express": "^4.14.1",
+    "highlightjs": "^9.8.0",
+    "jquery": "^3.1.1",
+    "require": "^2.4.20",
+    "signals": "^1.0.0",
+    "stats-js": "^1.0.0-alpha1",
+    "three": "^0.84.0"
+  },
+  "author": "",
+  "license": "ISC"
+}

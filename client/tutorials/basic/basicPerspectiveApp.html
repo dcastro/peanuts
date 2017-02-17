@@ -1,0 +1,108 @@
+<html>
+  <head>
+    <title>Peanuts</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/deps/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="/deps/highlightjs/styles/darkula.css">
+    <link rel="stylesheet" href="/styles/styles.css">
+
+
+    <script src="/deps/highlightjs/highlight.pack.min.js"></script>
+    <script src="/deps/dat.gui/build/dat.gui.min.js"></script>
+    <script src="/deps/stats-js/build/stats.min.js"></script>
+    <script src="/deps/signals/dist/signals.min.js"></script>
+
+    <script src="/deps/three/build/three.min.js"></script>
+    <script src="/deps/three/examples/js/controls/OrbitControls.js"></script>
+
+    <script src="/libs/peanuts.js"></script>
+    <script src="/libs/peanuts.three.app.js"></script>
+    <script src="/libs/peanuts.three.driver.js"></script>
+    <script src="/libs/peanuts.three.view.js"></script>
+    <script src="/libs/peanuts.three.win.js"></script>
+
+  </head>
+
+  <script type="text/javascript">
+
+    function onPageLoaded() {
+      initaliseApp1();
+      initaliseApp2();
+    }
+
+    function initaliseApp1() {
+
+        var appElement = document.getElementById("app1");
+
+        var appBuilder = new Peanuts.Three.App.Builder();
+
+        var app = appBuilder
+                 .withGLWindow(appElement)
+                 .withPerspectiveView()
+                 .build();
+
+        app.start();
+
+    }
+
+    function initaliseApp2() {
+
+        var appElement = document.getElementById("app2");
+
+        var app = new Peanuts.Three.App.Builder()
+                 .withGLWindow(appElement)
+                 .withPerspectiveView()
+                 .withDatGui()
+                 .build();
+
+
+        app.datGui.add()
+
+        app.start();
+
+    }
+
+  </script>
+
+  <script type="text/javascript">console.log('what',hljs); hljs.initHighlightingOnLoad();</script>
+
+  <body class="page" onload="onPageLoaded()">
+
+    <div class="container">
+
+      <h1>Basic Perspective App Setup</h1>
+
+      <div id="app1" class="tutorialApp" style="height:400px; margin-top:20px;"></div>
+
+      <pre>
+        <code>
+            // Find the div on the page you would like the application to appear in.
+            var appElement = document.getElementById("app");
+
+            // Configure your application, here we are asking for a WebGL window
+            // with a perspective view, by default Peanuts will create a cube and
+            // some three orbit controls so you know everythign is working.
+            var app = new Peanuts.Three.App.Builder()
+                     .withGLWindow(appElement)
+                     .withPerspectiveView()
+                     .build();
+
+            // This tells the engine to start running and render your stuff.
+            // In this case it's just to draw a cube :P but it gets more exciting
+            // I promise :)
+            app.start();
+        </code>
+      </pre>
+
+      <hr>
+
+      <h1>Playing With Persective Settings<h1>
+
+      <div id="app2" class="tutorialApp" style="height:400px; margin-top:20px;"></div>
+
+
+    </div>
+
+  </body>
+
+</html>

@@ -1,0 +1,53 @@
+body {
+  margin: 2em;
+  font-family: Arial, Helvetica, sans-serif;
+  height:100%; width:100%;
+}
+
+.page {
+  width: 90%;
+}
+
+.page h1 {
+  color: #369;
+  font-size: 250%;
+}
+
+.page h2 {
+  color: #369;
+  font-size: 125%;
+}
+
+.page h3 {
+  color: #369;
+  font-size: 100%;
+}
+
+
+.page p {
+  color: #369;
+  font-size: 100%;
+  margin-top: 20px;
+}
+
+.page pre {
+  margin-top: 20px;
+  background-color: #2b2b2b
+}
+
+.page ul > li , a {
+  color: #369;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 100%;
+}
+
+.tutorialApp {
+  position:relative;
+  margin-top:20px;
+  height:100%;
+  width:100%;
+}
+
+.tutorialApp canvas {
+  border-radius: 4px;
+}
