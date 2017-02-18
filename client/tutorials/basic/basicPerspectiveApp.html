@@ -39,24 +39,8 @@
         var app = appBuilder
                  .withGLWindow(appElement)
                  .withPerspectiveView()
+                 .withStats()
                  .build();
-
-        app.start();
-
-    }
-
-    function initaliseApp2() {
-
-        var appElement = document.getElementById("app2");
-
-        var app = new Peanuts.Three.App.Builder()
-                 .withGLWindow(appElement)
-                 .withPerspectiveView()
-                 .withDatGui()
-                 .build();
-
-
-        app.datGui.add()
 
         app.start();
 
@@ -64,7 +48,7 @@
 
   </script>
 
-  <script type="text/javascript">console.log('what',hljs); hljs.initHighlightingOnLoad();</script>
+  <script type="text/javascript">hljs.initHighlightingOnLoad();</script>
 
   <body class="page" onload="onPageLoaded()">
 
@@ -72,7 +56,7 @@
 
       <h1>Basic Perspective App Setup</h1>
 
-      <div id="app1" class="tutorialApp" style="height:400px; margin-top:20px;"></div>
+      <div id="app1" class="tutorialApp"></div>
 
       <pre>
         <code>
@@ -80,26 +64,20 @@
             var appElement = document.getElementById("app");
 
             // Configure your application, here we are asking for a WebGL window
-            // with a perspective view, by default Peanuts will create a cube and
-            // some three orbit controls so you know everythign is working.
+            // with a perspective view, by default Peanuts will create a default
+            // scene with some shapes and some three orbit controls so you know 
+            // everythign is working.
             var app = new Peanuts.Three.App.Builder()
                      .withGLWindow(appElement)
                      .withPerspectiveView()
                      .build();
 
             // This tells the engine to start running and render your stuff.
-            // In this case it's just to draw a cube :P but it gets more exciting
-            // I promise :)
+            // In this case it's just to draw a few shapes :P but it gets more 
+            // exciting, I promise :)
             app.start();
         </code>
       </pre>
-
-      <hr>
-
-      <h1>Playing With Persective Settings<h1>
-
-      <div id="app2" class="tutorialApp" style="height:400px; margin-top:20px;"></div>
-
 
     </div>
 

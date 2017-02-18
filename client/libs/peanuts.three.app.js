@@ -124,7 +124,7 @@ Peanuts.Three.App = function(Peanuts) {
         this.app.view = viewBuilder
                        .withPerspectiveCamera()
                        .withOrbitControls()
-                       .withScene()
+                       .withTestScene()
                        .build();
 
         return this;
@@ -140,7 +140,7 @@ Peanuts.Three.App = function(Peanuts) {
         this.app.view = viewBuilder
                        .withOrthographicCamera()
                        .withOrbitControls()
-                       .withScene()
+                       .withTestScene()
                        .build();
 
         return this;
@@ -184,12 +184,85 @@ Peanuts.Three.App = function(Peanuts) {
         return this;
     }
 
- 
+    //////////////////////////////////////////////////////////
+    //
+    //////////////////////////////////////////////////////////
+    function AppFactory() {
+
+    }
+
+
+    //////////////////////////////////////////////////////////
+    //
+    //////////////////////////////////////////////////////////
+    AppFactory.prototype.createSimpleGLPerspectiveApp = function(container) {
+
+        var appBuilder = new Peanuts.Three.App.Builder();
+
+        var app = appBuilder
+                 .withGLWindow(container)
+                 .withPerspectiveView()
+                 .withStats()
+                 .build();
+
+        return app;                 
+    }
+
+    //////////////////////////////////////////////////////////
+    //
+    //////////////////////////////////////////////////////////
+    AppFactory.prototype.createDemoGLPerspectiveApp = function(container) {
+
+        var appBuilder = new Peanuts.Three.App.Builder();
+
+        var app = appBuilder
+                 .withGLWindow(container)
+                 .withPerspectiveView()
+                 .withDatGui()
+                 .withStats()
+                 .build();
+
+        return app;                 
+    }
+
+
+     //////////////////////////////////////////////////////////
+    //
+    //////////////////////////////////////////////////////////
+    AppFactory.prototype.createSimpleGLOrthograpicApp = function(container) {
+
+        var appBuilder = new Peanuts.Three.App.Builder();
+
+        var app = appBuilder
+                 .withGLWindow(container)
+                 .withOrthograpicView()
+                 .build();
+
+        return app;                 
+    }
+
+     //////////////////////////////////////////////////////////
+    //
+    //////////////////////////////////////////////////////////
+    AppFactory.prototype.createDemoGLOrthograpicApp = function(container) {
+
+        var appBuilder = new Peanuts.Three.App.Builder();
+
+        var app = appBuilder
+                 .withGLWindow(container)
+                 .withOrthograpicView()
+                 .withDatGui()
+                 .build();
+
+        return app;                 
+    }
+
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
     Peanuts.Three.App = {}
     Peanuts.Three.App.Builder = AppBuilder;
+    Peanuts.Three.App.Factory = AppFactory;
 
     return Peanuts.Three.App;
 

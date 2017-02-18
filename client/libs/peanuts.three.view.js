@@ -1,3 +1,4 @@
+
 Peanuts.Three.View = function(Peanuts) {
 
     //////////////////////////////////////////////////////////
@@ -23,6 +24,16 @@ Peanuts.Three.View = function(Peanuts) {
            this.camera.aspect = width / height;
            this.camera.updateProjectionMatrix();
         }
+
+        return this;
+    }
+
+    //////////////////////////////////////////////////////////
+    //
+    //////////////////////////////////////////////////////////
+    View.prototype.setScene = function(scene) {
+
+        this.scene = scene;
 
         return this;
     }
@@ -93,7 +104,8 @@ Peanuts.Three.View = function(Peanuts) {
             this.view.app.win3D.width() / - (this.view.app.win3D.height()/2),
             this.view.app.win3D.width() / (this.view.app.win3D.height()/2), 
             this.view.app.win3D.height() / (this.view.app.win3D.height()/2), 
-            this.view.app.win3D.height() / - (this.view.app.win3D.height()/2)
+            this.view.app.win3D.height() / - (this.view.app.win3D.height()/2),
+            -100, 100
         );
 
         this.view.camera.position.z = 1;
@@ -120,15 +132,33 @@ Peanuts.Three.View = function(Peanuts) {
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
-    ViewBuilder.prototype.withScene = function() {
+    ViewBuilder.prototype.withTestScene = function() {
 
-        this.view.scene = new THREE.Scene();
+        var scene = new THREE.Scene();
 
-        var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-        var material = new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe:true });
-        var mesh = new THREE.Mesh( geometry, material );
+        var boxGeometry = new THREE.BoxGeometry( 1, 1, 1 );
+        var boxMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe:true });
+        var boxMesh = new THREE.Mesh( boxGeometry, boxMaterial );
 
-        this.view.scene.add(mesh);
+        boxMesh.position.x = -2;
+
+        scene.add(boxMesh);
+
+        var sphereGeometry = new THREE.SphereGeometry( 0.5, 16, 16 );
+        var sphereMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe:true });
+        var sphereMesh = new THREE.Mesh( sphereGeometry, sphereMaterial );
+
+        scene.add(sphereMesh);
+
+        var coneGeometry = new THREE.ConeGeometry( 0.5, 1, 16, 16 );
+        var coneMaterial = new THREE.MeshBasicMaterial( {color: 0x0000ff, wireframe:true });
+        var coneMesh = new THREE.Mesh( coneGeometry, coneMaterial );
+
+        coneMesh.position.x = 2;
+
+        scene.add( coneMesh );
+
+        this.view.setScene(scene);
 
         this.view.win.resize();
 
