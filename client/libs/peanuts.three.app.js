@@ -35,7 +35,9 @@ Peanuts.Three.App = function(Peanuts) {
     //
     //////////////////////////////////////////////////////////
     App.prototype.stop = function() {
+
         this.renderLoop.stop();
+
         return this;
     }
 
@@ -43,7 +45,9 @@ Peanuts.Three.App = function(Peanuts) {
     //
     //////////////////////////////////////////////////////////
     App.prototype.start = function() {
+
         this.renderLoop.start();
+
         return this;
     }
 
@@ -220,22 +224,6 @@ Peanuts.Three.App = function(Peanuts) {
                  .withPerspectiveView()
                  .withDatGui()
                  .withStats()
-                 .build();
-
-        return app;                 
-    }
-
-
-     //////////////////////////////////////////////////////////
-    //
-    //////////////////////////////////////////////////////////
-    AppFactory.prototype.createSimpleGLOrthograpicApp = function(container) {
-
-        var appBuilder = new Peanuts.Three.App.Builder();
-
-        var app = appBuilder
-                 .withGLWindow(container)
-                 .withOrthograpicView()
                  .build();
 
         return app;                 

@@ -9,6 +9,7 @@
   "dependencies": {
     "bootstrap": "^3.3.7",
     "dat-gui": "https://github.com/dataarts/dat.gui.git",
+    "dat.gui": "git+https://github.com/dataarts/dat.gui.git",
     "express": "^4.14.1",
     "highlightjs": "^9.8.0",
     "jquery": "^3.1.1",

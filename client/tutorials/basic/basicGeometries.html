@@ -1,11 +1,12 @@
 <html>
-  <head>
+<head>
+
     <title>Peanuts</title>
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/deps/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" href="/deps/highlightjs/styles/darkula.css">
     <link rel="stylesheet" href="/styles/styles.css">
-
 
     <script src="/deps/highlightjs/highlight.pack.min.js"></script>
     <script src="/deps/dat.gui/build/dat.gui.min.js"></script>
@@ -17,226 +18,461 @@
 
     <script src="/libs/peanuts.js"></script>
     <script src="/libs/peanuts.three.app.js"></script>
+    <script src="/libs/peanuts.three.dat.gui.js"></script>
     <script src="/libs/peanuts.three.driver.js"></script>
     <script src="/libs/peanuts.three.view.js"></script>
     <script src="/libs/peanuts.three.win.js"></script>
 
     <style type="text/css">
         .tutorialApp {
-          height:300px;
+            height: 300px;
         }
     </style>
 
-  </head>
+</head>
 
-  <script type="text/javascript">hljs.initHighlightingOnLoad();</script>
+<script type="text/javascript">hljs.initHighlightingOnLoad();</script>
 
-  <body class="page">
+<body class="page">
 
-    <div class="container">
+<div class="container">
 
-      <h1>Basic Geometries</h1>
+    <h1>Basic Geometries</h1>
 
-      <h2>Sphere Geometry</h2>
+    <h2>Sphere Geometry</h2>
 
-      <div id="app1" class="tutorialApp"></div>
+    <div id="appSphere" class="tutorialApp"></div>
 
-      <script type="text/javascript">
+    <script type="text/javascript">
 
-          (function setup() {
-
-            var app = new Peanuts.Three.App.Factory()
-                      .createDemoGLPerspectiveApp(
-                        document.getElementById("app1")
-                      );
-
-            var sphereGeometry = new THREE.SphereGeometry( 0.5, 16, 16 );
-            var sphereMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe:true });
-            var sphereMesh = new THREE.Mesh( sphereGeometry, sphereMaterial );
-
-            app.view.setScene(new THREE.Scene());
-
-            app.view.scene.add(sphereMesh);
-
-            app.start();
-
-          })();
-
-      </script>
-
-      <h2>Box Geometry</h2>
-
-      <div id="appBox" class="tutorialApp"></div>
-
-      <script type="text/javascript">
-
-          (function setup() {
+        (function setup() {
 
             var app = new Peanuts.Three.App.Factory()
-                      .createDemoGLPerspectiveApp(
-                        document.getElementById("appBox")
-                      );
+                .createDemoGLPerspectiveApp(
+                document.getElementById("appSphere")
+            ).start();
 
+            Peanuts.Three.Dat.Gui.Helpers.Geometry.Sphere.add(
+                app.datGui, {}, createScene
+            );
 
-            var boxGeometry = new THREE.BoxGeometry( 1, 1, 1 );
-            var boxMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe:true });
-            var boxMesh = new THREE.Mesh( boxGeometry, boxMaterial );
+            function createScene(demoSettings) {
 
-            app.view.setScene(new THREE.Scene());
+                var sphereGeometry = new THREE.SphereGeometry(
+                    demoSettings.radius,
+                    demoSettings.widthSegments,
+                    demoSettings.heightSegments,
+                    demoSettings.phiStart,
+                    demoSettings.phiLength,
+                    demoSettings.thetaStart,
+                    demoSettings.thetaLength
+                );
 
-            app.view.scene.add(boxMesh);
+                var sphereMaterial = new THREE.MeshBasicMaterial({
+                    color: 0x00ff00,
+                    wireframe: true
+                });
 
-            app.start();
+                var sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
 
-          })();
+                app.view.setScene(new THREE.Scene());
 
-      </script>
+                app.view.scene.add(sphereMesh);
+            }
 
-      <h2>Circle Geometry</h2>
+        })();
 
-      <div id="appCircle" class="tutorialApp"></div>
+    </script>
 
-      <script type="text/javascript">
+    <h2>Box Geometry</h2>
 
-          (function setup() {
+    <div id="appBox" class="tutorialApp"></div>
 
-            var app = new Peanuts.Three.App.Factory()
-                      .createDemoGLPerspectiveApp(
-                        document.getElementById("appCircle")
-                      );
+    <script type="text/javascript">
 
-
-            var circleGeometry = new THREE.CircleGeometry( 1, 32 );
-            var circleMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe:true });
-            var circleMesh = new THREE.Mesh( circleGeometry, circleMaterial );
-
-            app.view.setScene(new THREE.Scene());
-
-            app.view.scene.add(circleMesh);
-
-            app.start();
-
-          })();
-
-      </script>
-
-
-      <h2>Cone Geometry</h2>
-
-      <div id="appCone" class="tutorialApp"></div>
-
-      <script type="text/javascript">
-
-          (function setup() {
+        (function setup() {
 
             var app = new Peanuts.Three.App.Factory()
-                      .createDemoGLPerspectiveApp(
-                        document.getElementById("appCone")
-                      );
+                .createDemoGLPerspectiveApp(
+                document.getElementById("appBox")
+            ).start();
 
+            Peanuts.Three.Dat.Gui.Helpers.Geometry.Box.add(
+                app.datGui, {}, createScene
+            );
 
-            var coneGeometry = new THREE.ConeGeometry( 0.5, 1, 16, 16 );
-            var coneMaterial = new THREE.MeshBasicMaterial( {color: 0x00ff00, wireframe:true });
-            var coneMesh = new THREE.Mesh( coneGeometry, coneMaterial );
+            function createScene(demoSettings) {
 
-            app.view.setScene(new THREE.Scene());
+                var boxGeometry = new THREE.BoxGeometry(
+                    demoSettings.width,
+                    demoSettings.height,
+                    demoSettings.depth,
+                    demoSettings.widthSegments,
+                    demoSettings.heightSegments,
+                    demoSettings.depthSegments
+                );
 
-            app.view.scene.add(coneMesh);
+                var boxMaterial = new THREE.MeshBasicMaterial({
+                    wireframe: true,
+                    color: 0x00ff00
+                });
 
-            app.start();
+                var boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
 
-          })();
+                app.view.setScene(new THREE.Scene());
 
-      </script>
+                app.view.scene.add(boxMesh);
+            }
 
-      <h2>Cylinder Geometry</h2>
+        })();
 
-      <div id="appCylinder" class="tutorialApp"></div>
+    </script>
 
-      <script type="text/javascript">
+    <h2>Circle Geometry</h2>
 
-          (function setup() {
+    <div id="appCircle" class="tutorialApp"></div>
 
-            var app = new Peanuts.Three.App.Factory()
-                      .createDemoGLPerspectiveApp(
-                        document.getElementById("appCylinder")
-                      );
+    <script type="text/javascript">
 
-
-            var cylinderGeometry = new THREE.CylinderGeometry( 1, 1, 1, 32 );
-            var cylinderMaterial = new THREE.MeshBasicMaterial( {color: 0x00ff00, wireframe:true });
-            var cylinderMesh = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
-
-            app.view.setScene(new THREE.Scene());
-
-            app.view.scene.add(cylinderMesh);
-
-            app.start();
-
-          })();
-
-      </script>
-
-      <h2>Dodecahedron Geometry</h2>
-
-      <div id="appDodecahedron" class="tutorialApp"></div>
-
-      <script type="text/javascript">
-
-          (function setup() {
+        (function setup() {
 
             var app = new Peanuts.Three.App.Factory()
-                      .createDemoGLPerspectiveApp(
-                        document.getElementById("appDodecahedron")
-                      );
+                .createDemoGLPerspectiveApp(
+                document.getElementById("appCircle")
+            ).start();
+
+            Peanuts.Three.Dat.Gui.Helpers.Geometry.Circle.add(
+                app.datGui, {}, createScene
+            );
+
+            function createScene(demoSettings) {
+
+                var circleGeometry = new THREE.CircleGeometry(
+                    demoSettings.radius,
+                    demoSettings.segments,
+                    demoSettings.thetaStart,
+                    demoSettings.thetaLength
+                );
+
+                var circleMaterial = new THREE.MeshBasicMaterial({
+                    wireframe: true,
+                    color: 0x00ff00
+                });
+
+                var circleMesh = new THREE.Mesh(circleGeometry, circleMaterial);
+
+                app.view.setScene(new THREE.Scene());
+
+                app.view.scene.add(circleMesh);
+            }
+
+        })();
+
+    </script>
 
 
-            var dodecahedronGeometry = new THREE.DodecahedronGeometry( 1, 0 );
-            var dodecahedronMaterial = new THREE.MeshBasicMaterial( {color: 0x00ff00, wireframe:true });
-            var dodecahedronMesh = new THREE.Mesh( dodecahedronGeometry, dodecahedronMaterial );
+    <h2>Cone Geometry</h2>
 
-            app.view.setScene(new THREE.Scene());
+    <div id="appCone" class="tutorialApp"></div>
 
-            app.view.scene.add(dodecahedronMesh);
+    <script type="text/javascript">
 
-            app.start();
-
-          })();
-
-      </script>
-
-      <h2>Icosahedron Geometry</h2>
-
-      <div id="appIcosahedron" class="tutorialApp"></div>
-
-      <script type="text/javascript">
-
-          (function setup() {
+        (function setup() {
 
             var app = new Peanuts.Three.App.Factory()
-                      .createDemoGLPerspectiveApp(
-                        document.getElementById("appIcosahedron")
-                      );
+                .createDemoGLPerspectiveApp(
+                document.getElementById("appCone")
+            ).start();
+
+            Peanuts.Three.Dat.Gui.Helpers.Geometry.Cone.add(
+                app.datGui, {}, createScene
+            );
+
+            function createScene(demoSettings) {
+
+                var coneGeometry = new THREE.ConeGeometry(
+                    demoSettings.radius,
+                    demoSettings.height,
+                    demoSettings.radialSegments,
+                    demoSettings.heightSegments,
+                    demoSettings.openEnded,
+                    demoSettings.thetaStart,
+                    demoSettings.thetaLength
+                );
+
+                var coneMaterial = new THREE.MeshBasicMaterial({
+                    wireframe: true,
+                    color: 0x00ff00
+                });
+
+                var coneMesh = new THREE.Mesh(coneGeometry, coneMaterial);
+
+                app.view.setScene(new THREE.Scene());
+
+                app.view.scene.add(coneMesh);
+            }
+
+        })();
+
+    </script>
+
+    <h2>Cylinder Geometry</h2>
+
+    <div id="appCylinder" class="tutorialApp"></div>
+
+    <script type="text/javascript">
+
+        (function setup() {
+
+            var app = new Peanuts.Three.App.Factory()
+                .createDemoGLPerspectiveApp(
+                document.getElementById("appCylinder")
+            ).start();
+
+            Peanuts.Three.Dat.Gui.Helpers.Geometry.Cylinder.add(
+                app.datGui, {}, createScene
+            );
 
 
-            var icosahedronGeometry = new THREE.IcosahedronGeometry( 1, 0 );
-            var icosahedronMaterial = new THREE.MeshBasicMaterial( {color: 0x00ff00, wireframe:true });
-            var icosahedronMesh = new THREE.Mesh( icosahedronGeometry, icosahedronMaterial );
+            function createScene(demoSettings) {
 
-            app.view.setScene(new THREE.Scene());
+                var cylinderGeometry = new THREE.CylinderGeometry(
+                    demoSettings.radiusTop,
+                    demoSettings.radiusBottom,
+                    demoSettings.height,
+                    demoSettings.radiusSegments,
+                    demoSettings.heightSegments,
+                    demoSettings.openEnded,
+                    demoSettings.thetaStart,
+                    demoSettings.thetaLength
+                );
 
-            app.view.scene.add(icosahedronMesh);
+                var cylinderMaterial = new THREE.MeshBasicMaterial({
+                    wireframe: true,
+                    color: 0x00ff00
+                });
 
-            app.start();
+                var cylinderMesh = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
 
-          })();
+                app.view.setScene(new THREE.Scene());
 
-      </script>
+                app.view.scene.add(cylinderMesh);
+            }
+        })();
+
+    </script>
+
+    <h2>Dodecahedron Geometry</h2>
+
+    <div id="appDodecahedron" class="tutorialApp"></div>
+
+    <script type="text/javascript">
+
+        (function setup() {
+
+            var app = new Peanuts.Three.App.Factory()
+                .createDemoGLPerspectiveApp(
+                document.getElementById("appDodecahedron")
+            ).start();
+
+            Peanuts.Three.Dat.Gui.Helpers.Geometry.Dodecahedron.add(
+                app.datGui, {}, createScene
+            );
+
+            function createScene(demoSettings) {
+
+                var dodecahedronGeometry = new THREE.DodecahedronGeometry(
+                    demoSettings.radius,
+                    demoSettings.detail
+                );
+
+                var dodecahedronMaterial = new THREE.MeshBasicMaterial({
+                    wireframe: true,
+                    color: 0x00ff00
+                });
+
+                var dodecahedronMesh = new THREE.Mesh(dodecahedronGeometry, dodecahedronMaterial);
+
+                app.view.setScene(new THREE.Scene());
+
+                app.view.scene.add(dodecahedronMesh);
+
+            }
+
+        })();
+
+    </script>
+
+    <h2>Icosahedron Geometry</h2>
+
+    <div id="appIcosahedron" class="tutorialApp"></div>
+
+    <script type="text/javascript">
+
+        (function setup() {
+
+            var app = new Peanuts.Three.App.Factory()
+                .createDemoGLPerspectiveApp(
+                document.getElementById("appIcosahedron")
+            ).start();
+
+            Peanuts.Three.Dat.Gui.Helpers.Geometry.Icosahedron.add(
+                app.datGui, {}, createScene
+            );
+
+            function createScene(demoSettings) {
+
+                var icosahedronGeometry = new THREE.IcosahedronGeometry(
+                    demoSettings.radius,
+                    demoSettings.detail
+                );
+
+                var icosahedronMaterial = new THREE.MeshBasicMaterial({
+                    wireframe: true,
+                    color: 0x00ff00
+                });
+
+                var icosahedronMesh = new THREE.Mesh(icosahedronGeometry, icosahedronMaterial);
+
+                app.view.setScene(new THREE.Scene());
+
+                app.view.scene.add(icosahedronMesh);
+            }
+
+        })();
+
+    </script>
+
+    <h2>Octahedron Geometry</h2>
+
+    <div id="appOctahedron" class="tutorialApp"></div>
+
+    <script type="text/javascript">
+
+        (function setup() {
+
+            var app = new Peanuts.Three.App.Factory()
+                .createDemoGLPerspectiveApp(
+                document.getElementById("appOctahedron")
+            ).start();
+
+            Peanuts.Three.Dat.Gui.Helpers.Geometry.Octahedron.add(
+                app.datGui, {}, createScene
+            );
+
+            function createScene(demoSettings) {
+
+                var octahedronGeometry = new THREE.OctahedronGeometry(
+                    demoSettings.radius,
+                    demoSettings.detail
+                );
+
+                var octahedronMaterial = new THREE.MeshBasicMaterial({
+                    wireframe: true,
+                    color: 0x00ff00
+                });
+
+                var octahedronMesh = new THREE.Mesh(octahedronGeometry, octahedronMaterial);
+
+                app.view.setScene(new THREE.Scene());
+
+                app.view.scene.add(octahedronMesh);
+            }
+
+        })();
+
+    </script>
+
+    <h2>Plane Geometry</h2>
+
+    <div id="appPlane" class="tutorialApp"></div>
+
+    <script type="text/javascript">
+
+        (function setup() {
+
+            var app = new Peanuts.Three.App.Factory()
+                .createDemoGLPerspectiveApp(
+                document.getElementById("appPlane")
+            ).start();
+
+            Peanuts.Three.Dat.Gui.Helpers.Geometry.Plane.add(
+                app.datGui, {}, createScene
+            );
+
+            function createScene(demoSettings) {
+
+                var planeGeometry = new THREE.PlaneGeometry(
+                    demoSettings.width,
+                    demoSettings.height,
+                    demoSettings.widthSegments,
+                    demoSettings.heightSegments
+                );
+
+                var planeMaterial = new THREE.MeshBasicMaterial({
+                    wireframe: true,
+                    color: 0x00ff00,
+                    side: THREE.DoubleSide
+                });
+
+                var planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+
+                app.view.setScene(new THREE.Scene());
+
+                app.view.scene.add(planeMesh);
+            }
+
+        })();
+
+    </script>
 
 
-    </div>
+    <h2>Ring Geometry</h2>
 
+    <div id="appRing" class="tutorialApp"></div>
 
-  </body>
+    <script type="text/javascript">
+
+        (function setup() {
+
+            var app = new Peanuts.Three.App.Factory()
+                .createDemoGLPerspectiveApp(
+                document.getElementById("appRing")
+            ).start();
+
+            Peanuts.Three.Dat.Gui.Helpers.Geometry.Ring.add(
+                app.datGui, {}, createScene
+            );
+
+            function createScene(demoSettings) {
+
+                var ringGeometry = new THREE.RingGeometry(
+                    demoSettings.innerRadius,
+                    demoSettings.outerRadius,
+                    demoSettings.thetaSegments,
+                    demoSettings.phiSegments,
+                    demoSettings.thetaStart,
+                    demoSettings.thetaLength
+                );
+
+                var ringMaterial = new THREE.MeshBasicMaterial({
+                    wireframe: true,
+                    color: 0x00ff00
+                });
+
+                var ringMesh = new THREE.Mesh(ringGeometry, ringMaterial);
+
+                app.view.setScene(new THREE.Scene());
+
+                app.view.scene.add(ringMesh);
+            }
+
+        })();
+
+    </script>
+
+</div>
+
+</body>
 
 </html>
