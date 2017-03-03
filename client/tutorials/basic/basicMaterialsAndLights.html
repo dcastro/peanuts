@@ -1,0 +1,112 @@
+<html>
+<head>
+
+    <title>Peanuts</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/deps/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="/deps/highlightjs/styles/darkula.css">
+    <link rel="stylesheet" href="/styles/styles.css">
+
+    <script src="/deps/highlightjs/highlight.pack.min.js"></script>
+    <script src="/deps/dat.gui/build/dat.gui.min.js"></script>
+    <script src="/deps/stats-js/build/stats.min.js"></script>
+    <script src="/deps/signals/dist/signals.min.js"></script>
+
+    <script src="/deps/three/build/three.min.js"></script>
+    <script src="/deps/three/loaders/TextureLoader.js"></script>
+    <script src="/deps/three/examples/js/controls/OrbitControls.js"></script>
+
+    <script src="/libs/peanuts.js"></script>
+    <script src="/libs/peanuts.three.driver.js"></script>
+    <script src="/libs/peanuts.three.app.js"></script>
+    <script src="/libs/peanuts.three.app.builder.js"></script>
+    <script src="/libs/peanuts.three.app.factory.js"></script>
+    <script src="/libs/peanuts.three.view.js"></script>
+    <script src="/libs/peanuts.three.view.builder.js"></script>
+    <script src="/libs/peanuts.three.dat.gui.js"></script>
+    <script src="/libs/peanuts.three.dat.gui.materials.js"></script>
+
+    <style type="text/css">
+        .tutorialApp {
+            height: 300px;
+        }
+    </style>
+
+</head>
+
+<script type="text/javascript">hljs.initHighlightingOnLoad();</script>
+
+<body class="page">
+
+<div class="container">
+
+    <h1>Basic Materials</h1>
+
+    <h2>Mesh Basic Material</h2>
+
+    <div id="appMeshBasicMaterial" class="tutorialApp"></div>
+
+    <script type="text/javascript">
+
+        (function setup() {
+
+            var app = new Peanuts.Three.App.Factory(
+                document.getElementById("appMeshBasicMaterial")
+            ).createDemoGLPerspectiveApp();
+
+            Peanuts.Three.DatGui.Helpers.Materials.MeshBasic.add(
+                app.datGui, {}, {
+                    map: [
+                        "None",
+                        "textures/metal/mtl_O_c.png",
+                        "textures/metal/mtl_wall01_c.png",
+                        "textures/metal/mtl_wall02_c.png",
+                        "textures/metal/mtl_floor01_c.png",
+                        "textures/metal/mtl_floor02_c.png",
+                        "textures/metal/mtl_floor03_c.png",
+                        "textures/metal/mtl_walk01_c.png",
+                        "textures/stone/conc_slabs01_c.png",
+                        "textures/stone/conc_slabs02_c.png"
+                    ]
+                },
+                createScene
+            );
+
+            function createScene(demoSettings) {
+
+                var material = new THREE.MeshBasicMaterial({
+                    color: new THREE.Color(demoSettings.color),
+                    wireframe: demoSettings.wireframe
+                });
+
+                app.loader.texture.load(
+                    demoSettings.map,
+                    function (texture) {
+                        material.map = texture;
+                        material.needsUpdate = true;
+                    }
+                );
+
+                app.view.scene = new THREE.Scene();
+
+                app.view.scene.add(
+                    new THREE.Mesh(
+                        new THREE.BoxGeometry(2, 2, 2),
+                        material
+                    )
+                );
+            }
+
+            app.start();
+
+        })();
+
+    </script>
+
+
+</div>
+
+</body>
+
+</html>

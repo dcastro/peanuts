@@ -1,42 +1,43 @@
-Peanuts.Three.App = function(Peanuts) {
+Peanuts.Three.App = function (Peanuts) {
 
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
-    function App(win3D) {
+    function App(domElement) {
 
         var self = this;
 
-        this.win3D = win3D;
+        self.domElement = domElement;
 
-        this.win3D.signals.resized.add(function(width, height) {
-            if(self.view) { self.view.onResized(width,height);}
-        });
+        self.signals = {
+            onMouseMove: new signals.Signal(),
+            onMouseDown: new signals.Signal(),
+            onMouseUp: new signals.Signal(),
+            reSized: new signals.Signal()
+        };
 
-        this.renderLoop = new Peanuts.Three.Driver.Looper(function() {
-            
-            if(self.stats) { 
-               self.stats.begin(); 
+        self.driver = new Peanuts.Three.Driver.Driver(function () {
+
+            if (self.stats) {
+                self.stats.begin();
             }
-            
+
             self.update();
             self.render();
-            
-            if(self.stats) { 
-               self.stats.end(); 
+
+            if (self.stats) {
+                self.stats.end();
             }
 
         });
-        
-        return this;
-    }
 
-    //////////////////////////////////////////////////////////
-    //
-    //////////////////////////////////////////////////////////
-    App.prototype.stop = function() {
+        self.loader = {
+            texture: new THREE.TextureLoader()
+        }
 
-        this.renderLoop.stop();
+        self.loader.texture.setPath("/assets/");
+
+        window.addEventListener('resize', function () { onAppReSized(self); });
 
         return this;
     }
@@ -44,20 +45,33 @@ Peanuts.Three.App = function(Peanuts) {
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
-    App.prototype.start = function() {
+    App.prototype.setRenderer = function (renderer) {
 
-        this.renderLoop.start();
+        this.renderer = renderer;
+        this.renderer.setClearColor(0x000000, 0.2);
 
-        return this;
+        this.domElement.appendChild(this.renderer.domElement);
+
+        onAppReSized(this);
     }
 
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
-    App.prototype.initialise = function() {
+    App.prototype.setView = function (view) {
 
-        if(this.view) {
-           this.view.initialise();
+        this.view = view;
+
+        onAppReSized(this);
+    }
+
+    //////////////////////////////////////////////////////////
+    //
+    //////////////////////////////////////////////////////////
+    App.prototype.initialise = function () {
+
+        if (this.view && this.view.initialise) {
+            this.view.initialise();
         }
 
         return this;
@@ -66,10 +80,10 @@ Peanuts.Three.App = function(Peanuts) {
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
-    App.prototype.update = function() {
+    App.prototype.update = function () {
 
-        if(this.view) {
-           this.view.update();
+        if (this.view && this.view.update) {
+            this.view.update();
         }
 
         return this;
@@ -78,20 +92,21 @@ Peanuts.Three.App = function(Peanuts) {
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
-    App.prototype.render = function() {
+    App.prototype.render = function () {
 
-        if(this.view) {
-           this.view.render();
+        if (this.view && this.view.render) {
+            this.view.render();
         }
 
         return this;
     }
 
-
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
-    function AppBuilder() {
+    App.prototype.start = function () {
+
+        this.driver.start();
 
         return this;
     }
@@ -99,159 +114,41 @@ Peanuts.Three.App = function(Peanuts) {
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
-    AppBuilder.prototype.build = function() {
+    App.prototype.stop = function () {
 
-        this.app.win3D.resize();
-
-        return this.app;
-    }
-
-    //////////////////////////////////////////////////////////
-    //
-    //////////////////////////////////////////////////////////
-    AppBuilder.prototype.withGLWindow = function(container) {
-
-        this.app = new App(
-            Peanuts.Three.Window.Factory.createGLWindow(container)
-        );
-
-        return this; 
-    }
-
-    //////////////////////////////////////////////////////////
-    //
-    //////////////////////////////////////////////////////////
-    AppBuilder.prototype.withPerspectiveView = function(view) {
-
-        var viewBuilder = new Peanuts.Three.View.Builder(this.app);
-
-        this.app.view = viewBuilder
-                       .withPerspectiveCamera()
-                       .withOrbitControls()
-                       .withTestScene()
-                       .build();
+        this.driver.stop();
 
         return this;
     }
 
-    //////////////////////////////////////////////////////////
-    //
-    //////////////////////////////////////////////////////////
-    AppBuilder.prototype.withOrthograpicView = function(view) {
+    function onAppReSized(app) {
 
-        var viewBuilder = new Peanuts.Three.View.Builder(this.app);
+        var size = app.domElement.getBoundingClientRect();
 
-        this.app.view = viewBuilder
-                       .withOrthographicCamera()
-                       .withOrbitControls()
-                       .withTestScene()
-                       .build();
+        if (app.renderer) {
+            app.renderer.setSize(
+                size.width,
+                size.height
+            );
+        }
 
-        return this;
-    }
-
-    //////////////////////////////////////////////////////////
-    //
-    //////////////////////////////////////////////////////////
-    AppBuilder.prototype.withDatGui = function() {
-
-        this.app.datGui = new dat.GUI({ autoPlace: false });
-        this.app.datGui.domElement.style.top="0px";
-        this.app.datGui.domElement.style.right="0px";
-        this.app.datGui.domElement.style.position="Absolute";
-        this.app.win3D.container.appendChild(this.app.datGui.domElement);
-
-        return this;
-    }
-
-    //////////////////////////////////////////////////////////
-    //
-    //////////////////////////////////////////////////////////
-    AppBuilder.prototype.withStats = function() {
-
-        this.app.stats = new Stats();
-        this.app.stats.domElement.style.top="0px";
-        this.app.stats.domElement.style.left="0px";
-        this.app.stats.domElement.style.position="Absolute";
-        this.app.win3D.container.appendChild(this.app.stats.domElement);
-
-        return this;
-    }
-
-    //////////////////////////////////////////////////////////
-    //
-    //////////////////////////////////////////////////////////
-    AppBuilder.prototype.withAudio = function() {
-
-        this.app.audio = new Peanuts.Audio.SimplePlayer();
-
-        return this;
-    }
-
-    //////////////////////////////////////////////////////////
-    //
-    //////////////////////////////////////////////////////////
-    function AppFactory() {
-
-    }
-
-
-    //////////////////////////////////////////////////////////
-    //
-    //////////////////////////////////////////////////////////
-    AppFactory.prototype.createSimpleGLPerspectiveApp = function(container) {
-
-        var appBuilder = new Peanuts.Three.App.Builder();
-
-        var app = appBuilder
-                 .withGLWindow(container)
-                 .withPerspectiveView()
-                 .withStats()
-                 .build();
-
-        return app;                 
-    }
-
-    //////////////////////////////////////////////////////////
-    //
-    //////////////////////////////////////////////////////////
-    AppFactory.prototype.createDemoGLPerspectiveApp = function(container) {
-
-        var appBuilder = new Peanuts.Three.App.Builder();
-
-        var app = appBuilder
-                 .withGLWindow(container)
-                 .withPerspectiveView()
-                 .withDatGui()
-                 .withStats()
-                 .build();
-
-        return app;                 
-    }
-
-     //////////////////////////////////////////////////////////
-    //
-    //////////////////////////////////////////////////////////
-    AppFactory.prototype.createDemoGLOrthograpicApp = function(container) {
-
-        var appBuilder = new Peanuts.Three.App.Builder();
-
-        var app = appBuilder
-                 .withGLWindow(container)
-                 .withOrthograpicView()
-                 .withDatGui()
-                 .build();
-
-        return app;                 
+        if (app.view) {
+            app.view.setViewPort({
+                x: 0,
+                y: 0,
+                w: size.width,
+                h: size.height
+            });
+        }
     }
 
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
     Peanuts.Three.App = {}
-    Peanuts.Three.App.Builder = AppBuilder;
-    Peanuts.Three.App.Factory = AppFactory;
+    Peanuts.Three.App.App = App
 
     return Peanuts.Three.App;
 
-}(Peanuts)
+}
+(Peanuts)

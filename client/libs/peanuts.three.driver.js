@@ -3,7 +3,7 @@ Peanuts.Three.Driver = function(Peanuts) {
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
-    Looper = function(func) {
+    Driver = function(func) {
 
         this.running = false;
         this.func = func;
@@ -14,7 +14,7 @@ Peanuts.Three.Driver = function(Peanuts) {
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
-    Looper.prototype.start = function() {
+    Driver.prototype.start = function() {
 
         if(this.running == false) {
            this.running = true;
@@ -25,14 +25,14 @@ Peanuts.Three.Driver = function(Peanuts) {
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
-    Looper.prototype.stop = function() {
+    Driver.prototype.stop = function() {
         this.running = false;
     }
 
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
-    Looper.prototype.run = function() {
+    Driver.prototype.run = function() {
 
         var self = this;
 
@@ -48,7 +48,7 @@ Peanuts.Three.Driver = function(Peanuts) {
     //
     //////////////////////////////////////////////////////////
     Peanuts.Three.Driver  = {}
-    Peanuts.Three.Driver.Looper = Looper;
+    Peanuts.Three.Driver.Driver = Driver;
     
     return Peanuts.Three.Driver;
 

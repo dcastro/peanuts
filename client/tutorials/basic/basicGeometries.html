@@ -17,11 +17,14 @@
     <script src="/deps/three/examples/js/controls/OrbitControls.js"></script>
 
     <script src="/libs/peanuts.js"></script>
-    <script src="/libs/peanuts.three.app.js"></script>
-    <script src="/libs/peanuts.three.dat.gui.js"></script>
     <script src="/libs/peanuts.three.driver.js"></script>
+    <script src="/libs/peanuts.three.app.js"></script>
+    <script src="/libs/peanuts.three.app.builder.js"></script>
+    <script src="/libs/peanuts.three.app.factory.js"></script>
     <script src="/libs/peanuts.three.view.js"></script>
-    <script src="/libs/peanuts.three.win.js"></script>
+    <script src="/libs/peanuts.three.view.builder.js"></script>
+    <script src="/libs/peanuts.three.dat.gui.js"></script>
+    <script src="/libs/peanuts.three.dat.gui.geometry.js"></script>
 
     <style type="text/css">
         .tutorialApp {
@@ -47,14 +50,9 @@
 
         (function setup() {
 
-            var app = new Peanuts.Three.App.Factory()
-                .createDemoGLPerspectiveApp(
+            var app = new Peanuts.Three.App.Factory(
                 document.getElementById("appSphere")
-            ).start();
-
-            Peanuts.Three.Dat.Gui.Helpers.Geometry.Sphere.add(
-                app.datGui, {}, createScene
-            );
+            ).createDemoGLPerspectiveApp();
 
             function createScene(demoSettings) {
 
@@ -80,6 +78,12 @@
                 app.view.scene.add(sphereMesh);
             }
 
+            Peanuts.Three.DatGui.Helpers.Geometry.Sphere.add(
+                app.datGui, {}, createScene
+            );
+
+            app.start();
+
         })();
 
     </script>
@@ -92,14 +96,9 @@
 
         (function setup() {
 
-            var app = new Peanuts.Three.App.Factory()
-                .createDemoGLPerspectiveApp(
+            var app = new Peanuts.Three.App.Factory(
                 document.getElementById("appBox")
-            ).start();
-
-            Peanuts.Three.Dat.Gui.Helpers.Geometry.Box.add(
-                app.datGui, {}, createScene
-            );
+            ).createDemoGLPerspectiveApp();
 
             function createScene(demoSettings) {
 
@@ -124,6 +123,12 @@
                 app.view.scene.add(boxMesh);
             }
 
+            Peanuts.Three.DatGui.Helpers.Geometry.Box.add(
+                app.datGui, {}, createScene
+            );
+
+            app.start();
+
         })();
 
     </script>
@@ -136,12 +141,11 @@
 
         (function setup() {
 
-            var app = new Peanuts.Three.App.Factory()
-                .createDemoGLPerspectiveApp(
+            var app = new Peanuts.Three.App.Factory(
                 document.getElementById("appCircle")
-            ).start();
+            ).createDemoGLPerspectiveApp();
 
-            Peanuts.Three.Dat.Gui.Helpers.Geometry.Circle.add(
+            Peanuts.Three.DatGui.Helpers.Geometry.Circle.add(
                 app.datGui, {}, createScene
             );
 
@@ -166,6 +170,8 @@
                 app.view.scene.add(circleMesh);
             }
 
+            app.start();
+
         })();
 
     </script>
@@ -179,12 +185,11 @@
 
         (function setup() {
 
-            var app = new Peanuts.Three.App.Factory()
-                .createDemoGLPerspectiveApp(
+            var app = new Peanuts.Three.App.Factory(
                 document.getElementById("appCone")
-            ).start();
+            ).createDemoGLPerspectiveApp();
 
-            Peanuts.Three.Dat.Gui.Helpers.Geometry.Cone.add(
+            Peanuts.Three.DatGui.Helpers.Geometry.Cone.add(
                 app.datGui, {}, createScene
             );
 
@@ -212,6 +217,8 @@
                 app.view.scene.add(coneMesh);
             }
 
+            app.start();
+
         })();
 
     </script>
@@ -224,15 +231,13 @@
 
         (function setup() {
 
-            var app = new Peanuts.Three.App.Factory()
-                .createDemoGLPerspectiveApp(
+            var app = new Peanuts.Three.App.Factory(
                 document.getElementById("appCylinder")
-            ).start();
+            ).createDemoGLPerspectiveApp();
 
-            Peanuts.Three.Dat.Gui.Helpers.Geometry.Cylinder.add(
+            Peanuts.Three.DatGui.Helpers.Geometry.Cylinder.add(
                 app.datGui, {}, createScene
             );
-
 
             function createScene(demoSettings) {
 
@@ -258,6 +263,9 @@
 
                 app.view.scene.add(cylinderMesh);
             }
+
+            app.start();
+
         })();
 
     </script>
@@ -270,12 +278,11 @@
 
         (function setup() {
 
-            var app = new Peanuts.Three.App.Factory()
-                .createDemoGLPerspectiveApp(
+            var app = new Peanuts.Three.App.Factory(
                 document.getElementById("appDodecahedron")
-            ).start();
+            ).createDemoGLPerspectiveApp();
 
-            Peanuts.Three.Dat.Gui.Helpers.Geometry.Dodecahedron.add(
+            Peanuts.Three.DatGui.Helpers.Geometry.Dodecahedron.add(
                 app.datGui, {}, createScene
             );
 
@@ -299,6 +306,8 @@
 
             }
 
+            app.start();
+
         })();
 
     </script>
@@ -311,12 +320,11 @@
 
         (function setup() {
 
-            var app = new Peanuts.Three.App.Factory()
-                .createDemoGLPerspectiveApp(
+            var app = new Peanuts.Three.App.Factory(
                 document.getElementById("appIcosahedron")
-            ).start();
+            ).createDemoGLPerspectiveApp();
 
-            Peanuts.Three.Dat.Gui.Helpers.Geometry.Icosahedron.add(
+            Peanuts.Three.DatGui.Helpers.Geometry.Icosahedron.add(
                 app.datGui, {}, createScene
             );
 
@@ -339,6 +347,8 @@
                 app.view.scene.add(icosahedronMesh);
             }
 
+            app.start();
+
         })();
 
     </script>
@@ -351,12 +361,11 @@
 
         (function setup() {
 
-            var app = new Peanuts.Three.App.Factory()
-                .createDemoGLPerspectiveApp(
+            var app = new Peanuts.Three.App.Factory(
                 document.getElementById("appOctahedron")
-            ).start();
+            ).createDemoGLPerspectiveApp();
 
-            Peanuts.Three.Dat.Gui.Helpers.Geometry.Octahedron.add(
+            Peanuts.Three.DatGui.Helpers.Geometry.Octahedron.add(
                 app.datGui, {}, createScene
             );
 
@@ -379,6 +388,8 @@
                 app.view.scene.add(octahedronMesh);
             }
 
+            app.start();
+
         })();
 
     </script>
@@ -391,12 +402,11 @@
 
         (function setup() {
 
-            var app = new Peanuts.Three.App.Factory()
-                .createDemoGLPerspectiveApp(
+            var app = new Peanuts.Three.App.Factory(
                 document.getElementById("appPlane")
-            ).start();
+            ).createDemoGLPerspectiveApp();
 
-            Peanuts.Three.Dat.Gui.Helpers.Geometry.Plane.add(
+            Peanuts.Three.DatGui.Helpers.Geometry.Plane.add(
                 app.datGui, {}, createScene
             );
 
@@ -422,6 +432,8 @@
                 app.view.scene.add(planeMesh);
             }
 
+            app.start();
+
         })();
 
     </script>
@@ -435,12 +447,11 @@
 
         (function setup() {
 
-            var app = new Peanuts.Three.App.Factory()
-                .createDemoGLPerspectiveApp(
+            var app = new Peanuts.Three.App.Factory(
                 document.getElementById("appRing")
-            ).start();
+            ).createDemoGLPerspectiveApp();
 
-            Peanuts.Three.Dat.Gui.Helpers.Geometry.Ring.add(
+            Peanuts.Three.DatGui.Helpers.Geometry.Ring.add(
                 app.datGui, {}, createScene
             );
 
@@ -466,6 +477,8 @@
 
                 app.view.scene.add(ringMesh);
             }
+
+            app.start();
 
         })();
 

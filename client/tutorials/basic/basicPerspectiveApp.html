@@ -16,10 +16,12 @@
     <script src="/deps/three/examples/js/controls/OrbitControls.js"></script>
 
     <script src="/libs/peanuts.js"></script>
-    <script src="/libs/peanuts.three.app.js"></script>
     <script src="/libs/peanuts.three.driver.js"></script>
+    <script src="/libs/peanuts.three.app.js"></script>
+    <script src="/libs/peanuts.three.app.builder.js"></script>
+    <script src="/libs/peanuts.three.app.factory.js"></script>
     <script src="/libs/peanuts.three.view.js"></script>
-    <script src="/libs/peanuts.three.win.js"></script>
+    <script src="/libs/peanuts.three.view.builder.js"></script>
 
   </head>
 
@@ -27,17 +29,16 @@
 
     function onPageLoaded() {
       initaliseApp1();
-      initaliseApp2();
     }
 
     function initaliseApp1() {
 
         var appElement = document.getElementById("app1");
 
-        var appBuilder = new Peanuts.Three.App.Builder();
+        console.log(Peanuts.Three.App);
 
-        var app = appBuilder
-                 .withGLWindow(appElement)
+        var app = new Peanuts.Three.App.Builder(appElement)
+                 .withGLRenderer()
                  .withPerspectiveView()
                  .withStats()
                  .build();
@@ -67,8 +68,8 @@
             // with a perspective view, by default Peanuts will create a default
             // scene with some shapes and some three orbit controls so you know 
             // everythign is working.
-            var app = new Peanuts.Three.App.Builder()
-                     .withGLWindow(appElement)
+            var app = new Peanuts.Three.App.Builder(appElement)
+                     .withGLRenderer()
                      .withPerspectiveView()
                      .build();
 
