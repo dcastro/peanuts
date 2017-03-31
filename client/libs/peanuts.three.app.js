@@ -82,8 +82,8 @@ Peanuts.Three.App = function (Peanuts) {
     //////////////////////////////////////////////////////////
     App.prototype.update = function () {
 
-        if (this.view && this.view.update) {
-            this.view.update();
+        if (this.onUpdate) {
+            this.onUpdate();
         }
 
         return this;
@@ -145,10 +145,9 @@ Peanuts.Three.App = function (Peanuts) {
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
-    Peanuts.Three.App = {}
-    Peanuts.Three.App.App = App
+    var AppPackage = { App:App };
 
-    return Peanuts.Three.App;
+    return AppPackage;
 
 }
 (Peanuts)

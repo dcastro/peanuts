@@ -312,11 +312,6 @@ Peanuts.Three.DatGui.Helpers.Geometry = function(Peanuts) {
         Ring: RingSettingsUIHelper
     };
 
-    //////////////////////////////////////////////////////////
-    //
-    //////////////////////////////////////////////////////////
-    Peanuts.Three.DatGui.Helpers.Geometry = GeometrySettingsHelpers;
-
-    return Peanuts.Three.DatGui.Helpers.Geometry;
+    return GeometrySettingsHelpers;
 
 }(Peanuts);

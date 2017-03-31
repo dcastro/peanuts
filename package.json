@@ -16,7 +16,8 @@
     "require": "^2.4.20",
     "signals": "^1.0.0",
     "stats-js": "^1.0.0-alpha1",
-    "three": "^0.84.0"
+    "three": "^0.84.0",
+    "tweenjs": "0.0.0"
   },
   "author": "",
   "license": "ISC"

@@ -25,11 +25,14 @@
     <script src="/libs/peanuts.three.view.js"></script>
     <script src="/libs/peanuts.three.view.builder.js"></script>
     <script src="/libs/peanuts.three.dat.gui.js"></script>
+    <script src="/libs/peanuts.three.dat.gui.lights.js"></script>
     <script src="/libs/peanuts.three.dat.gui.materials.js"></script>
+    <script src="/libs/peanuts.three.math.js"></script>
+    <script src="/libs/peanuts.three.math.helpers.js"></script>
 
     <style type="text/css">
         .tutorialApp {
-            height: 300px;
+            height: 600px;
         }
     </style>
 
@@ -55,35 +58,25 @@
                 document.getElementById("appMeshBasicMaterial")
             ).createDemoGLPerspectiveApp();
 
-            Peanuts.Three.DatGui.Helpers.Materials.MeshBasic.add(
-                app.datGui, {}, {
-                    map: [
-                        "None",
-                        "textures/metal/mtl_O_c.png",
-                        "textures/metal/mtl_wall01_c.png",
-                        "textures/metal/mtl_wall02_c.png",
-                        "textures/metal/mtl_floor01_c.png",
-                        "textures/metal/mtl_floor02_c.png",
-                        "textures/metal/mtl_floor03_c.png",
-                        "textures/metal/mtl_walk01_c.png",
-                        "textures/stone/conc_slabs01_c.png",
-                        "textures/stone/conc_slabs02_c.png"
-                    ]
-                },
-                createScene
-            );
-
-            function createScene(demoSettings) {
+            function createScene(materialSettings) {
 
                 var material = new THREE.MeshBasicMaterial({
-                    color: new THREE.Color(demoSettings.color),
-                    wireframe: demoSettings.wireframe
+                    color: new THREE.Color(materialSettings.color),
+                    wireframe: materialSettings.wireframe
                 });
 
                 app.loader.texture.load(
-                    demoSettings.map,
+                    materialSettings.map,
                     function (texture) {
                         material.map = texture;
+                        material.needsUpdate = true;
+                    }
+                );
+
+                app.loader.texture.load(
+                    materialSettings.specularMap,
+                    function (texture) {
+                        material.specularMap = texture;
                         material.needsUpdate = true;
                     }
                 );
@@ -98,12 +91,310 @@
                 );
             }
 
+
+            var materialSettings = { map: "textures/metal/mtl_O_c.png" };
+
+            Peanuts.Three.DatGui.Helpers.Materials.MeshBasic.add(
+                app.datGui, 
+                materialSettings, {
+                    map: [
+                        "None",
+                        "textures/metal/mtl_O_c.png",
+                        "textures/metal/mtl_wall01_c.png",
+                        "textures/metal/mtl_wall02_c.png",
+                        "textures/metal/mtl_floor01_c.png",
+                        "textures/metal/mtl_floor02_c.png",
+                        "textures/metal/mtl_floor03_c.png"
+                    ]
+                },
+                createScene
+            );
+
+
             app.start();
 
         })();
 
     </script>
 
+    <h2>Mesh Lambert Material</h2>
+
+    <div id="appMeshLambertMaterial" class="tutorialApp"></div>
+
+    <script type="text/javascript">
+
+        (function setup() {
+
+            var self = this;
+
+            var app = new Peanuts.Three.App.Factory(
+                document.getElementById("appMeshLambertMaterial")
+            ).createDemoGLPerspectiveApp();
+
+
+            function createScene(lightSettings, materialSettings) {
+
+                var lightAmbient = new THREE.AmbientLight(0x404040);
+
+                var lightDirectional = new THREE.DirectionalLight(
+                    lightSettings.color, 
+                    lightSettings.intensity
+                );
+
+                lightDirectional.position.setFromSpherical(
+                    new THREE.Spherical(
+                        lightSettings.distance,
+                        lightSettings.phi,
+                        lightSettings.theta
+                    )
+                );
+
+                var lightDirectionalHelper = new THREE.DirectionalLightHelper(lightDirectional, 2);
+
+
+                var material = new THREE.MeshLambertMaterial({
+                    color: new THREE.Color(materialSettings.color),
+                    wireframe: materialSettings.wireframe,
+                    opacity: materialSettings.opacity
+                });
+
+                app.loader.texture.load(
+                    materialSettings.map,
+                    function (texture) {
+                        material.map = texture;
+                        material.needsUpdate = true;
+                    }
+                );
+
+                app.loader.texture.load(
+                    materialSettings.specularMap,
+                    function (texture) {
+                        material.specularMap = texture;
+                        material.needsUpdate = true;
+                    }
+                );
+
+                var geometry = new THREE.BoxGeometry(2, 2, 2);
+                    geometry.computeVertexNormals();
+                    geometry.computeFaceNormals();
+
+                var mesh = new THREE.Mesh(geometry, material);
+
+                app.view.scene = new THREE.Scene();
+
+                app.view.scene.add(lightAmbient);
+                app.view.scene.add(lightDirectional);
+                app.view.scene.add(lightDirectionalHelper);
+
+                app.view.scene.add(mesh);
+            }
+
+            function initaliseUI() {
+
+                var settings = {
+                    material: { map: "textures/metal/mtl_O_c.png" },
+                    light: {}
+                };
+
+                Peanuts.Three.DatGui.Helpers.Materials.MeshLambert.add(
+                    app.datGui.addFolder("LambertMaterial"), 
+                    settings.material, {
+                        map: [
+                            "None",
+                            "textures/metal/mtl_O_c.png",
+                            "textures/metal/mtl_wall01_c.png",
+                            "textures/metal/mtl_floor01_c.png",
+                            "textures/metal/mtl_floor02_c.png",
+                            "textures/metal/mtl_floor03_c.png"
+                        ],
+                        specularMap: [
+                            "None",
+                            "textures/metal/mtl_O_s.png",
+                            "textures/metal/mtl_wall01_s.png",
+                            "textures/metal/mtl_floor01_s.png",
+                            "textures/metal/mtl_floor02_s.png",
+                            "textures/metal/mtl_floor03_s.png"
+                        ]
+                    },
+                    function(materialSettings) {
+                        settings.material = materialSettings;
+                        createScene(
+                            settings.light, 
+                            settings.material
+                        );
+
+                    }
+                );
+
+                Peanuts.Three.DatGui.Helpers.Lights.Directional.add(
+                    app.datGui.addFolder("DirectionalLight"), 
+                    settings.light, {},  
+                    function(lightSettings) {
+                        settings.light = lightSettings;
+                        createScene(
+                            settings.light, 
+                            settings.material
+                        );
+                    }
+                );
+            }
+
+            initaliseUI();
+
+            app.start();
+
+        })();
+
+    </script>
+
+    <h2>Mesh Phong Material</h2>
+
+    <div id="appMeshPhongMaterial" class="tutorialApp"></div>
+
+    <script type="text/javascript">
+
+        (function setup() {
+
+            var app = new Peanuts.Three.App.Factory(
+                document.getElementById("appMeshPhongMaterial")
+            ).createDemoGLPerspectiveApp();
+
+
+            function createScene(lightSettings, materialSettings) {
+
+                var lightAmbient = new THREE.AmbientLight(0x404040);
+
+                var lightDirectional = new THREE.DirectionalLight(
+                    lightSettings.color, 
+                    lightSettings.intensity
+                );
+
+                lightDirectional.position.setFromSpherical(
+                    new THREE.Spherical(
+                        lightSettings.distance,
+                        lightSettings.phi,
+                        lightSettings.theta
+                    )
+                );
+
+                var lightDirectionalHelper = new THREE.DirectionalLightHelper(lightDirectional, 2);
+
+                var material = new THREE.MeshPhongMaterial({
+                    color: new THREE.Color(materialSettings.color),
+                    wireframe: materialSettings.wireframe,
+                    opacity: materialSettings.opacity
+                });
+
+                app.loader.texture.load(
+                    materialSettings.map,
+                    function (texture) {
+                        material.map = texture;
+                        material.needsUpdate = true;
+                    }
+                );
+
+                app.loader.texture.load(
+                    materialSettings.specularMap,
+                    function (texture) {
+                        material.specularMap = texture;
+                        material.needsUpdate = true;
+                    }
+                );
+
+                app.loader.texture.load(
+                    materialSettings.normalMap,
+                    function (texture) {
+                        material.normalMap = texture;
+                        material.needsUpdate = true;
+                    }
+                );
+
+                var geometry = new THREE.BoxGeometry(2, 2, 2);
+                    geometry.computeVertexNormals();
+                    geometry.computeFaceNormals();
+
+                var mesh = new THREE.Mesh(geometry, material);
+
+
+
+                app.view.scene = new THREE.Scene();
+
+                app.view.scene.add(lightAmbient);
+                app.view.scene.add(lightDirectional);
+                app.view.scene.add(lightDirectionalHelper);
+
+                app.view.scene.add(mesh);
+            }
+
+
+            function initaliseUI() {
+
+                var settings = {
+                    material: { 
+                        map: "textures/metal/mtl_O_c.png",
+                        specularMap: "textures/metal/mtl_O_s.png",
+                        normalMap: "textures/metal/mtl_O_n.png"  
+                    },
+                    light: {}
+                };
+
+                Peanuts.Three.DatGui.Helpers.Materials.MeshPhong.add(
+                    app.datGui.addFolder("PhongMaterial"), 
+                    settings.material, {
+                        map: [
+                            "None",
+                            "textures/metal/mtl_O_c.png",
+                            "textures/metal/mtl_wall01_c.png",
+                            "textures/metal/mtl_floor01_c.png",
+                            "textures/metal/mtl_floor02_c.png",
+                            "textures/metal/mtl_floor03_c.png"
+                        ],
+                        specularMap: [
+                            "None",
+                            "textures/metal/mtl_O_s.png",
+                            "textures/metal/mtl_wall01_s.png",
+                            "textures/metal/mtl_floor01_s.png",
+                            "textures/metal/mtl_floor02_s.png",
+                            "textures/metal/mtl_floor03_s.png"
+                        ],
+                        normalMap : [
+                            "textures/metal/mtl_O_n.png",
+                            "textures/metal/mtl_wall01_n.png",
+                            "textures/metal/mtl_floor01_n.png",
+                            "textures/metal/mtl_floor02_n.png",
+                            "textures/metal/mtl_floor03_n.png"  
+                        ]
+                    },
+                    function(materialSettings) {
+                        settings.material = materialSettings;
+                        createScene(
+                            settings.light, 
+                            settings.material
+                        );
+                    }
+                );
+
+                Peanuts.Three.DatGui.Helpers.Lights.Directional.add(
+                    app.datGui.addFolder("DirectionalLight"), 
+                    settings.light, {},  
+                    function(lightSettings) {
+                        settings.light = lightSettings;    
+                        createScene(
+                            settings.light, 
+                            settings.material
+                        );
+                    }
+                );
+
+            }
+
+            initaliseUI();
+
+            app.start();
+
+        })();
+
+    </script>
 
 </div>
 

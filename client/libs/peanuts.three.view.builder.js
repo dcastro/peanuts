@@ -78,7 +78,6 @@ Peanuts.Three.View.Builder = function (Peanuts) {
         var boxMaterial = new THREE.MeshBasicMaterial({color: 0xff0000, wireframe: true});
         var boxMesh = new THREE.Mesh(boxGeometry, boxMaterial); boxMesh.name = "Box";
 
-
         boxMesh.position.x = -4;
 
         scene.add(boxMesh);
@@ -102,11 +101,6 @@ Peanuts.Three.View.Builder = function (Peanuts) {
         return this;
     };
 
-    //////////////////////////////////////////////////////////
-    //
-    //////////////////////////////////////////////////////////
-    Peanuts.Three.View.Builder = ViewBuilder;
-
-    return Peanuts.Three.View.Builder;
+    return ViewBuilder;
 
 }(Peanuts)

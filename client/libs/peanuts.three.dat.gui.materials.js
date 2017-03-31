@@ -25,10 +25,12 @@ Peanuts.Three.DatGui.Helpers.Materials = function(Peanuts) {
             linewidth:1,
             color:"#ff0000"
         },
+        options: {},
 
-        add : function (gui, parameters, onChange) {
+        add : function (gui, settings, options, onChange) {
 
-            var settings = Peanuts.Object.mixin(this.defaults, parameters);
+            settings = Peanuts.Object.mixin(this.defaults, parameters);
+            options = Peanuts.Object.mixin(this.options, options);
 
             var controllers = [];
 
@@ -56,17 +58,17 @@ Peanuts.Three.DatGui.Helpers.Materials = function(Peanuts) {
             map: ["none"]
         },
 
-        add : function (gui, parameters, options, onChange) {
+        add : function (gui, settings, options, onChange) {
 
-            var settings = Peanuts.Object.mixin(this.defaults, parameters);
-            var options = Peanuts.Object.mixin(this.options, options);
+            settings = Peanuts.Object.mixin(this.defaults, settings);
+            options = Peanuts.Object.mixin(this.options, options);
 
             var controllers = [];
 
             controllers.push(gui.add(settings, 'wireframe'));
             controllers.push(gui.addColor(settings, 'color'));
             controllers.push(gui.add(settings, 'map', options.map));
-
+            
             onChangeMapper(controllers, onChange, settings);
         }
 
@@ -80,23 +82,65 @@ Peanuts.Three.DatGui.Helpers.Materials = function(Peanuts) {
         defaults: {
             color:"#ffffff",
             wireframe: false,
-            map: null
+            opacity: 1,
+            map: null,
+            specularMap: null
         },
 
         options: {
-            map: ["none"]
+            map: ["none"],
+            specularMap: ["none"]
         },
 
-        add : function (gui, parameters, options, onChange) {
+        add : function (gui, settings, options, onChange) {
 
-            var settings = Peanuts.Object.mixin(this.defaults, parameters);
-            var options = Peanuts.Object.mixin(this.options, options);
+            settings = Peanuts.Object.mixin(this.defaults, settings);
+            options = Peanuts.Object.mixin(this.options, options);
+
+            var controllers = [];
+
+            controllers.push(gui.add(settings, 'wireframe'));
+            controllers.push(gui.addColor(settings, 'color'));
+            controllers.push(gui.add(settings, 'opacity', 0, 1));
+            controllers.push(gui.add(settings, 'map', options.map));
+            controllers.push(gui.add(settings, 'specularMap', options.specularMap));
+
+            onChangeMapper(controllers, onChange, settings);
+        }
+
+    };
+
+    //////////////////////////////////////////////////////////
+    //
+    //////////////////////////////////////////////////////////
+    var MeshPhongMaterialSettingsUIHelper = {
+
+        defaults: {
+            color:"#ffffff",
+            wireframe: false,
+            map: null,
+            specularMap: null,
+            normalMap: null
+        },
+
+        options: {
+            map: ["none"],
+            specularMap: ["none"],
+            normalMap: ["none"]
+        },
+
+        add : function (gui, settings, options, onChange) {
+
+            settings = Peanuts.Object.mixin(this.defaults, settings);
+            options = Peanuts.Object.mixin(this.options, options);
 
             var controllers = [];
 
             controllers.push(gui.add(settings, 'wireframe'));
             controllers.push(gui.addColor(settings, 'color'));
             controllers.push(gui.add(settings, 'map', options.map));
+            controllers.push(gui.add(settings, 'specularMap', options.specularMap));
+            controllers.push(gui.add(settings, 'normalMap', options.normalMap));
 
             onChangeMapper(controllers, onChange, settings);
         }
@@ -109,14 +153,10 @@ Peanuts.Three.DatGui.Helpers.Materials = function(Peanuts) {
     var MaterialsSettingsHelpers =  {
         LineBasic: LineBasicMaterialSettingsUIHelper,
         MeshBasic: MeshBasicMaterialSettingsUIHelper,
-        MeshLambert: MeshLambertMaterialSettingsUIHelper
+        MeshLambert: MeshLambertMaterialSettingsUIHelper,
+        MeshPhong: MeshPhongMaterialSettingsUIHelper
     };
 
-    //////////////////////////////////////////////////////////
-    //
-    //////////////////////////////////////////////////////////
-    Peanuts.Three.DatGui.Helpers.Materials = MaterialsSettingsHelpers;
-
-    return Peanuts.Three.DatGui.Helpers.Materials;
+    return MaterialsSettingsHelpers;
 
 }(Peanuts);
