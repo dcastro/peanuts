@@ -41,13 +41,13 @@ body {
   font-size: 100%;
 }
 
-.tutorialApp {
+.threeApp {
   position:relative;
   margin-top:20px;
   height:400px;
   width:100%;
 }
 
-.tutorialApp canvas {
+.threeApp canvas {
   border-radius: 4px;
 }

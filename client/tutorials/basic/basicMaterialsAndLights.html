@@ -14,7 +14,6 @@
     <script src="/deps/signals/dist/signals.min.js"></script>
 
     <script src="/deps/three/build/three.min.js"></script>
-    <script src="/deps/three/loaders/TextureLoader.js"></script>
     <script src="/deps/three/examples/js/controls/OrbitControls.js"></script>
 
     <script src="/libs/peanuts.js"></script>
@@ -31,7 +30,7 @@
     <script src="/libs/peanuts.three.math.helpers.js"></script>
 
     <style type="text/css">
-        .tutorialApp {
+        .threeApp {
             height: 600px;
         }
     </style>
@@ -48,7 +47,7 @@
 
     <h2>Mesh Basic Material</h2>
 
-    <div id="appMeshBasicMaterial" class="tutorialApp"></div>
+    <div id="appMeshBasicMaterial" class="threeApp"></div>
 
     <script type="text/javascript">
 
@@ -119,7 +118,7 @@
 
     <h2>Mesh Lambert Material</h2>
 
-    <div id="appMeshLambertMaterial" class="tutorialApp"></div>
+    <div id="appMeshLambertMaterial" class="threeApp"></div>
 
     <script type="text/javascript">
 
@@ -249,7 +248,7 @@
 
     <h2>Mesh Phong Material</h2>
 
-    <div id="appMeshPhongMaterial" class="tutorialApp"></div>
+    <div id="appMeshPhongMaterial" class="threeApp"></div>
 
     <script type="text/javascript">
 
@@ -314,8 +313,6 @@
                     geometry.computeFaceNormals();
 
                 var mesh = new THREE.Mesh(geometry, material);
-
-
 
                 app.view.scene = new THREE.Scene();
 

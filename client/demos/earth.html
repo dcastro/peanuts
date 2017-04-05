@@ -1,0 +1,149 @@
+<html>
+<head>
+
+    <title>Peanuts</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/deps/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="/deps/highlightjs/styles/darkula.css">
+    <link rel="stylesheet" href="/styles/styles.css">
+
+    <script src="/deps/highlightjs/highlight.pack.min.js"></script>
+    <script src="/deps/dat.gui/build/dat.gui.min.js"></script>
+    <script src="/deps/stats-js/build/stats.min.js"></script>
+    <script src="/deps/signals/dist/signals.min.js"></script>
+
+    <script src="/deps/three/build/three.min.js"></script>
+    <script src="/deps/three/examples/js/controls/OrbitControls.js"></script>
+
+    <script src="/libs/peanuts.js"></script>
+    <script src="/libs/peanuts.three.driver.js"></script>
+    <script src="/libs/peanuts.three.app.js"></script>
+    <script src="/libs/peanuts.three.app.builder.js"></script>
+    <script src="/libs/peanuts.three.app.factory.js"></script>
+    <script src="/libs/peanuts.three.view.js"></script>
+    <script src="/libs/peanuts.three.view.builder.js"></script>
+    <script src="/libs/peanuts.three.dat.gui.js"></script>
+    <script src="/libs/peanuts.three.dat.gui.geometry.js"></script>
+
+    <style type="text/css">
+        .threeApp {
+            height: 800px;
+        }
+    </style>
+
+</head>
+
+<script type="text/javascript">hljs.initHighlightingOnLoad();</script>
+
+<body class="page">
+
+<div class="container">
+
+    <h1>Earth Demo</h1>
+
+    <h2>Sphere Geometry</h2>
+
+    <div id="appEarth" class="threeApp"></div>
+
+    <script type="text/javascript">
+
+        (function setup() {
+
+            var app = new Peanuts.Three.App.Factory(
+                document.getElementById("appEarth")
+            ).createDemoGLPerspectiveApp();
+
+
+            var demoSettings =  {
+                light : {
+                    position: new THREE.Vector3(-55,50,0),
+                    color :  new THREE.Color(0xFFFFFF),
+                    intensity : 1
+                }, 
+                globe : {
+                    geometry: {
+                        radius : 50,
+                        widthSegments : 64,
+                        heightSegments : 64
+                    },
+                    material: {
+                        opacity: 1,
+                        wireframe : false,
+                        color :  new THREE.Color(0xFF0000),
+                        map: "textures/earth/earthspec1k.jpg",
+                        bumpMap: "textures/earth/earthbump1k.jpg",
+                        specularMap: "textures/earth/earthspec1k.jpg",
+                    }
+                }
+            };
+
+            function createScene(demoSettings) {
+
+                var ambientLight = new THREE.AmbientLight(0x999999);
+
+                var lightDirectional = new THREE.DirectionalLight(
+                    demoSettings.light.color,
+                    demoSettings.light.intensity
+                );
+
+                lightDirectional.position.copy(demoSettings.light.position);
+
+                var lightDirectionalHelper = new THREE.DirectionalLightHelper(lightDirectional, 2);
+
+                var sphereGeometry = new THREE.SphereGeometry(
+                    demoSettings.globe.geometry.radius,
+                    demoSettings.globe.geometry.widthSegments,
+                    demoSettings.globe.geometry.heightSegments
+                );
+
+                var sphereMaterial = new THREE.MeshPhongMaterial({
+                    color: new THREE.Color(demoSettings.globe.material.color),
+                    wireframe: demoSettings.globe.material.wireframe,
+                    opacity: demoSettings.globe.material.opacity
+                });
+
+                var sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
+
+                var setTexture = function(material, toSet) {
+                    return function(texture) {
+                        material[toSet] = texture;
+                        material.needsUpdate = true;
+                        texture.minFilter = THREE.LinearFilter;
+                    };
+                };
+
+                app.loader.texture.load( demoSettings.globe.material.map, setTexture(sphereMaterial, "map"));
+                app.loader.texture.load( demoSettings.globe.material.bumpMap, setTexture(sphereMaterial, "bumpMap"));
+                app.loader.texture.load( demoSettings.globe.material.specularMap, setTexture(sphereMaterial, "specularMap"));
+
+                console.log(app);
+
+                app.view.camera.position.set(0,0, demoSettings.globe.geometry.radius * -3);
+                app.view.controls.update();
+
+                app.view.setScene(new THREE.Scene());
+
+                app.view.scene.add(app.view.camera);
+                app.view.scene.add(ambientLight);
+                app.view.scene.add(lightDirectional);
+                app.view.scene.add(sphereMesh);
+            }
+
+            createScene(demoSettings);
+
+
+
+
+            app.start();
+
+        })();
+
+    </script>
+
+
+</div>
+
+</body>
+
+</html>
