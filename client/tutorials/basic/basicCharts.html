@@ -1,0 +1,74 @@
+<html>
+<head>
+
+    <title>Peanuts</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/deps/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="/deps/highlightjs/styles/darkula.css">
+    <link rel="stylesheet" href="/styles/styles.css">
+
+    <script src="/deps/highlightjs/highlight.pack.min.js"></script>
+    <script src="/deps/dat.gui/build/dat.gui.min.js"></script>
+    <script src="/deps/stats-js/build/stats.min.js"></script>
+    <script src="/deps/signals/dist/signals.min.js"></script>
+
+    <script src="/deps/three/build/three.min.js"></script>
+    <script src="/deps/three/examples/js/controls/OrbitControls.js"></script>
+
+    <script src="/libs/peanuts.js"></script>
+    <script src="/libs/peanuts.three.driver.js"></script>
+    <script src="/libs/peanuts.three.app.js"></script>
+    <script src="/libs/peanuts.three.app.builder.js"></script>
+    <script src="/libs/peanuts.three.app.factory.js"></script>
+    <script src="/libs/peanuts.three.view.js"></script>
+    <script src="/libs/peanuts.three.view.builder.js"></script>
+    <script src="/libs/peanuts.three.dat.gui.js"></script>
+    <script src="/libs/peanuts.three.charts.js"></script>
+
+    <style type="text/css">
+        .tutorialApp {
+            height: 300px;
+        }
+    </style>
+
+</head>
+
+<script type="text/javascript">hljs.initHighlightingOnLoad();</script>
+
+<body class="page">
+
+<div class="container">
+
+    <h1>Basic Charts</h1>
+
+    <h2>Timeseries</h2>
+
+    <div id="appSphere" class="tutorialApp"></div>
+
+    <script type="text/javascript">
+
+        (function setup() {
+
+            var app = new Peanuts.Three.App.Factory(
+                document.getElementById("appSphere")
+            ).createDemoGLorthographicApp();
+
+            function createScene(demoSettings) {
+
+                var chart = new Charts.Timeseries(function genDatata() {});
+
+                app.view.setScene(new THREE.Scene());
+
+                app.view.scene.add(chart);
+            }
+
+            app.start();
+
+        })();
+
+    </script>
+
+</body>
+
+</html>

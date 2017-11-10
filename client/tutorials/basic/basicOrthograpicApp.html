@@ -16,10 +16,12 @@
     <script src="/deps/three/examples/js/controls/OrbitControls.js"></script>
 
     <script src="/libs/peanuts.js"></script>
-    <script src="/libs/peanuts.three.app.js"></script>
     <script src="/libs/peanuts.three.driver.js"></script>
+    <script src="/libs/peanuts.three.app.js"></script>
+    <script src="/libs/peanuts.three.app.builder.js"></script>
+    <script src="/libs/peanuts.three.app.factory.js"></script>
     <script src="/libs/peanuts.three.view.js"></script>
-    <script src="/libs/peanuts.three.win.js"></script>
+    <script src="/libs/peanuts.three.view.builder.js"></script>
 
   </head>
 
@@ -33,8 +35,8 @@
 
         var appElement = document.getElementById("app");
 
-        var app = new Peanuts.Three.App.Builder()
-                 .withGLWindow(appElement)
+        var app = new Peanuts.Three.App.Builder(appElement)
+                 .withGLRenderer()
                  .withOrthograpicView()
                  .withStats()
                  .build();
@@ -64,8 +66,8 @@
             // with an orthographic view, by default Peanuts will create a default
             // scene with some shapes and some three orbit controls so you know 
             // everythign is working.
-            var app = new Peanuts.Three.App.Builder()
-                     .withGLWindow(appElement)
+            var app = new Peanuts.Three.App.Builder(appElement)
+                     .withGLRenderer()
                      .withOrthograpicView()
                      .build();
 
