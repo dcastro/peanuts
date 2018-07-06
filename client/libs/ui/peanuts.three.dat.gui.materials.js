@@ -1,3 +1,6 @@
+Peanuts.Three.DatGui = Peanuts.Three.DatGui || {};
+Peanuts.Three.DatGui.Helpers = Peanuts.Three.DatGui.Helpers || {};
+
 Peanuts.Three.DatGui.Helpers.Materials = function(Peanuts) {
 
     var onChangeMapper = function(controllers, onChange, settings) {
@@ -29,8 +32,8 @@ Peanuts.Three.DatGui.Helpers.Materials = function(Peanuts) {
 
         add : function (gui, settings, options, onChange) {
 
-            settings = Peanuts.Object.mixin(this.defaults, parameters);
-            options = Peanuts.Object.mixin(this.options, options);
+            settings = Peanuts.Peanut.mixin(this.defaults, parameters);
+            options = Peanuts.Peanut.mixin(this.options, options);
 
             var controllers = [];
 
@@ -60,8 +63,8 @@ Peanuts.Three.DatGui.Helpers.Materials = function(Peanuts) {
 
         add : function (gui, settings, options, onChange) {
 
-            settings = Peanuts.Object.mixin(this.defaults, settings);
-            options = Peanuts.Object.mixin(this.options, options);
+            settings = Peanuts.Peanut.mixin(this.defaults, settings);
+            options = Peanuts.Peanut.mixin(this.options, options);
 
             var controllers = [];
 
@@ -94,8 +97,8 @@ Peanuts.Three.DatGui.Helpers.Materials = function(Peanuts) {
 
         add : function (gui, settings, options, onChange) {
 
-            settings = Peanuts.Object.mixin(this.defaults, settings);
-            options = Peanuts.Object.mixin(this.options, options);
+            settings = Peanuts.Peanut.mixin(this.defaults, settings);
+            options = Peanuts.Peanut.mixin(this.options, options);
 
             var controllers = [];
 
@@ -131,8 +134,8 @@ Peanuts.Three.DatGui.Helpers.Materials = function(Peanuts) {
 
         add : function (gui, settings, options, onChange) {
 
-            settings = Peanuts.Object.mixin(this.defaults, settings);
-            options = Peanuts.Object.mixin(this.options, options);
+            settings = Peanuts.Peanut.mixin(this.defaults, settings);
+            options = Peanuts.Peanut.mixin(this.options, options);
 
             var controllers = [];
 
@@ -147,16 +150,11 @@ Peanuts.Three.DatGui.Helpers.Materials = function(Peanuts) {
 
     };
 
-    //////////////////////////////////////////////////////////
-    //
-    //////////////////////////////////////////////////////////
-    var MaterialsSettingsHelpers =  {
+    return {
         LineBasic: LineBasicMaterialSettingsUIHelper,
         MeshBasic: MeshBasicMaterialSettingsUIHelper,
         MeshLambert: MeshLambertMaterialSettingsUIHelper,
         MeshPhong: MeshPhongMaterialSettingsUIHelper
     };
-
-    return MaterialsSettingsHelpers;
 
 }(Peanuts);

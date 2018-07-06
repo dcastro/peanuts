@@ -1,3 +1,6 @@
+Peanuts.Three.DatGui = Peanuts.Three.DatGui || {};
+Peanuts.Three.DatGui.Helpers = Peanuts.Three.DatGui.Helpers || {};
+
 Peanuts.Three.DatGui.Helpers.Geometry = function(Peanuts) {
 
     var onChangeMapper = function(controllers, onChange, settings) {
@@ -32,7 +35,7 @@ Peanuts.Three.DatGui.Helpers.Geometry = function(Peanuts) {
 
         add : function (gui, parameters, onChange) {
 
-            var settings = Peanuts.Object.mixin(this.defaults, parameters);
+            var settings = Peanuts.Peanut.mixin(this.defaults, parameters);
 
             var controllers = [];
 
@@ -65,7 +68,7 @@ Peanuts.Three.DatGui.Helpers.Geometry = function(Peanuts) {
 
         add : function (gui, parameters, onChange) {
 
-            var settings = Peanuts.Object.mixin(this.defaults, parameters);
+            var settings = Peanuts.Peanut.mixin(this.defaults, parameters);
 
             var controllers = [];
 
@@ -94,7 +97,7 @@ Peanuts.Three.DatGui.Helpers.Geometry = function(Peanuts) {
 
         add : function (gui, parameters, onChange) {
 
-            var settings = Peanuts.Object.mixin(this.defaults, parameters);
+            var settings = Peanuts.Peanut.mixin(this.defaults, parameters);
 
             var controllers = [];
 
@@ -124,7 +127,7 @@ Peanuts.Three.DatGui.Helpers.Geometry = function(Peanuts) {
 
         add : function (gui, parameters, onChange) {
 
-            var settings = Peanuts.Object.mixin(this.defaults, parameters);
+            var settings = Peanuts.Peanut.mixin(this.defaults, parameters);
 
             var controllers = [];
 
@@ -158,7 +161,7 @@ Peanuts.Three.DatGui.Helpers.Geometry = function(Peanuts) {
 
         add : function (gui, parameters, onChange) {
 
-            var settings = Peanuts.Object.mixin(this.defaults, parameters);
+            var settings = Peanuts.Peanut.mixin(this.defaults, parameters);
 
             var controllers = [];
 
@@ -186,7 +189,7 @@ Peanuts.Three.DatGui.Helpers.Geometry = function(Peanuts) {
 
         add : function (gui, parameters, onChange) {
 
-            var settings = Peanuts.Object.mixin(this.defaults, parameters);
+            var settings = Peanuts.Peanut.mixin(this.defaults, parameters);
 
             var controllers = [];
 
@@ -207,7 +210,7 @@ Peanuts.Three.DatGui.Helpers.Geometry = function(Peanuts) {
 
         add : function (gui, parameters, onChange) {
 
-            var settings = Peanuts.Object.mixin(this.defaults, parameters);
+            var settings = Peanuts.Peanut.mixin(this.defaults, parameters);
 
             var controllers = [];
 
@@ -228,7 +231,7 @@ Peanuts.Three.DatGui.Helpers.Geometry = function(Peanuts) {
 
         add : function (gui, parameters, onChange) {
 
-            var settings = Peanuts.Object.mixin(this.defaults, parameters);
+            var settings = Peanuts.Peanut.mixin(this.defaults, parameters);
 
             var controllers = [];
 
@@ -252,7 +255,7 @@ Peanuts.Three.DatGui.Helpers.Geometry = function(Peanuts) {
 
         add : function (gui, parameters, onChange) {
 
-            var settings = Peanuts.Object.mixin(this.defaults, parameters);
+            var settings = Peanuts.Peanut.mixin(this.defaults, parameters);
 
             var controllers = [];
 
@@ -281,7 +284,7 @@ Peanuts.Three.DatGui.Helpers.Geometry = function(Peanuts) {
 
         add : function (gui, parameters, onChange) {
 
-            var settings = Peanuts.Object.mixin(this.defaults, parameters);
+            var settings = Peanuts.Peanut.mixin(this.defaults, parameters);
 
             var controllers = [];
 
@@ -296,10 +299,7 @@ Peanuts.Three.DatGui.Helpers.Geometry = function(Peanuts) {
         }
     };
 
-    //////////////////////////////////////////////////////////
-    //
-    //////////////////////////////////////////////////////////
-    var GeometrySettingsHelpers =  {
+    return  {
         Sphere: SphereSettingsUIHelper,
         Box: BoxSettingsUIHelper,
         Circle: CircleSettingsUIHelper,
@@ -311,7 +311,5 @@ Peanuts.Three.DatGui.Helpers.Geometry = function(Peanuts) {
         Plane: PlaneSettingsUIHelper,
         Ring: RingSettingsUIHelper
     };
-
-    return GeometrySettingsHelpers;
 
 }(Peanuts);

@@ -1,4 +1,6 @@
-Peanuts.Three.View = function (Peanuts) {
+Peanuts.Three.View = Peanuts.Three.View || {};
+
+Peanuts.Three.View.View = function (Peanuts) {
 
     //////////////////////////////////////////////////////////
     //
@@ -89,12 +91,6 @@ Peanuts.Three.View = function (Peanuts) {
         return this;
     };
 
-    //////////////////////////////////////////////////////////
-    //
-    //////////////////////////////////////////////////////////
-    Peanuts.Three.View = {}
-    Peanuts.Three.View.View = View;
-
-    return Peanuts.Three.View;
+    return View;
 
 }(Peanuts)

@@ -1,3 +1,6 @@
+Peanuts.Three.DatGui = Peanuts.Three.DatGui || {};
+Peanuts.Three.DatGui.Helpers = Peanuts.Three.DatGui.Helpers || {};
+
 Peanuts.Three.DatGui.Helpers.Lights = function(Peanuts) {
 
     var onChangeMapper = function(controllers, onChange, settings) {
@@ -29,11 +32,9 @@ Peanuts.Three.DatGui.Helpers.Lights = function(Peanuts) {
         },
 
         add : function (gui, settings, options, onChange) {
-
-            console.log('light helper called');
-
-            settings = Peanuts.Object.mixin(this.defaults, settings);
-            options = Peanuts.Object.mixin(this.defaults, options);
+            
+            settings = Peanuts.Peanut.mixin(this.defaults, settings);
+            options = Peanuts.Peanut.mixin(this.defaults, options);
 
             var controllers = [];
 
@@ -49,13 +50,8 @@ Peanuts.Three.DatGui.Helpers.Lights = function(Peanuts) {
 
     };
 
-    //////////////////////////////////////////////////////////
-    //
-    //////////////////////////////////////////////////////////
-    var LightSettingsHelpers =  {
+    return {
         Directional: DirectionalLightSettingsUIHelper
     };
-
-    return LightSettingsHelpers;
 
 }(Peanuts);

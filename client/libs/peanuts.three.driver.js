@@ -44,12 +44,6 @@ Peanuts.Three.Driver = function(Peanuts) {
         });
     }
 
-    //////////////////////////////////////////////////////////
-    //
-    //////////////////////////////////////////////////////////
-    Peanuts.Three.Driver  = {}
-    Peanuts.Three.Driver.Driver = Driver;
-    
-    return Peanuts.Three.Driver;
+    return Driver;
 
 }(Peanuts)

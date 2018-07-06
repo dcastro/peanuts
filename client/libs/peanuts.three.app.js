@@ -1,4 +1,6 @@
-Peanuts.Three.App = function (Peanuts) {
+Peanuts.Three.App = Peanuts.Three.App || {}
+
+Peanuts.Three.App.App = function (Peanuts) {
 
     //////////////////////////////////////////////////////////
     //
@@ -9,7 +11,7 @@ Peanuts.Three.App = function (Peanuts) {
 
         self.domElement = domElement;
 
-        self.driver = new Peanuts.Three.Driver.Driver(function () {
+        self.driver = new Peanuts.Three.Driver(function () {
 
             if (self.stats) {
                 self.stats.begin();
@@ -24,20 +26,23 @@ Peanuts.Three.App = function (Peanuts) {
 
         });
 
+        self.inputs  =  {
+            mouse : new Peanuts.Three.Inputs.Mouse(self.domElement)
+        };
+
+        self.events = {
+            onReSized: new signals.Signal()
+        };
+
         self.loader = {
             texture: new THREE.TextureLoader()
         }
 
         self.loader.texture.setPath("/assets/");
 
-        self.events = {
-            onMouseMove: new signals.Signal(),
-            onMouseDown: new signals.Signal(),
-            onMouseUp: new signals.Signal(),
-            onReSized: new signals.Signal()
-        };
-
-        window.addEventListener('resize', function () { onAppReSized(self); });
+        window.addEventListener('resize', function () { 
+            onAppReSized(self); 
+        });
 
         return this;
     }
@@ -85,7 +90,6 @@ Peanuts.Three.App = function (Peanuts) {
         if (this.view && this.view.update) {
             this.view.update();
         }
-
 
         return this;
     }
@@ -142,17 +146,6 @@ Peanuts.Three.App = function (Peanuts) {
 
     }
 
-    function onMouseMove(app, event) {
-
-
-    }
-
-    //////////////////////////////////////////////////////////
-    //
-    //////////////////////////////////////////////////////////
-    var AppPackage = { App:App };
-
-    return AppPackage;
-
+    return App;
 }
 (Peanuts)

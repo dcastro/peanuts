@@ -1,3 +1,5 @@
+Peanuts.Three.App = Peanuts.Three.App || {}
+
 Peanuts.Three.App.Builder = function (Peanuts) {
 
     //////////////////////////////////////////////////////////
@@ -109,12 +111,7 @@ Peanuts.Three.App.Builder = function (Peanuts) {
         return this;
     };
 
-    //////////////////////////////////////////////////////////
-    //
-    //////////////////////////////////////////////////////////
-    Peanuts.Three.App.Builder = AppBuilder;
-
-    return Peanuts.Three.App.Builder;
+    return AppBuilder;
 
 }
 (Peanuts)

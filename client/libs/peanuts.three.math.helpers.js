@@ -1,3 +1,5 @@
+Peanuts.Three.Math = Peanuts.Three.Math || {};
+
 Peanuts.Three.Math.Helpers = function(Peanuts) {
 
 	var PolarHelper = {
@@ -16,8 +18,6 @@ Peanuts.Three.Math.Helpers = function(Peanuts) {
     var MathHelpers = {
     	Polar: PolarHelper
     };
-
-    console.log('returning math helpers', MathHelpers);
 
     return MathHelpers;
 

@@ -1,3 +1,5 @@
+Peanuts.Three.App = Peanuts.Three.App || {}
+
 Peanuts.Three.App.Factory = function (Peanuts) {
 
     //////////////////////////////////////////////////////////
@@ -37,12 +39,6 @@ Peanuts.Three.App.Factory = function (Peanuts) {
         return app;
     }
 
-    //////////////////////////////////////////////////////////
-    //
-    //////////////////////////////////////////////////////////
-    Peanuts.Three.App.Factory = AppFactory;
-
-    return Peanuts.Three.App.Factory;
-
+    return AppFactory;
 }
 (Peanuts)

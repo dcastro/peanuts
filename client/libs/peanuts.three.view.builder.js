@@ -1,3 +1,5 @@
+Peanuts.Three.View = Peanuts.Three.View || {};
+
 Peanuts.Three.View.Builder = function (Peanuts) {
 
 
