@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="/deps/highlightjs/styles/darkula.css">
     <link rel="stylesheet" href="/styles/styles.css">
 
+    <script src="/scripts/codePrinter.js"></script>
+
     <script src="/deps/highlightjs/highlight.pack.min.js"></script>
     <script src="/deps/dat.gui/build/dat.gui.min.js"></script>
     <script src="/deps/stats-js/build/stats.min.js"></script>
@@ -24,11 +26,9 @@
     <script src="/libs/peanuts.three.app.factory.js"></script>
     <script src="/libs/peanuts.three.view.js"></script>
     <script src="/libs/peanuts.three.view.builder.js"></script>
-    <script src="/libs/peanuts.three.dat.gui.js"></script>
-    <script src="/libs/peanuts.three.dat.gui.lights.js"></script>
-    <script src="/libs/peanuts.three.dat.gui.materials.js"></script>
-    <script src="/libs/peanuts.three.math.js"></script>
     <script src="/libs/peanuts.three.math.helpers.js"></script>
+    <script src="/libs/ui/peanuts.three.dat.gui.lights.js"></script>
+    <script src="/libs/ui/peanuts.three.dat.gui.materials.js"></script>
 
     <style type="text/css">
         .threeApp {
@@ -37,8 +37,6 @@
     </style>
 
 </head>
-
-<script type="text/javascript">hljs.initHighlightingOnLoad();</script>
 
 <body class="page">
 
@@ -52,7 +50,7 @@
 
     <script type="text/javascript">
 
-        (function setup() {
+        (CodePrinter.printAndRun(function() {
 
             var app = new Peanuts.Three.App.Factory(
                 document.getElementById("appMeshBasicMaterial")
@@ -113,7 +111,7 @@
 
             app.start();
 
-        })();
+        }))();
 
     </script>
 
@@ -123,7 +121,7 @@
 
     <script type="text/javascript">
 
-        (function setup() {
+        (CodePrinter.printAndRun(function() {
 
             var self = this;
 
@@ -243,7 +241,7 @@
 
             app.start();
 
-        })();
+        }))();
 
     </script>
 
@@ -253,7 +251,7 @@
 
     <script type="text/javascript">
 
-        (function setup() {
+        (CodePrinter.printAndRun(function() {
 
             var app = new Peanuts.Three.App.Factory(
                 document.getElementById("appMeshPhongMaterial")
@@ -390,7 +388,7 @@
 
             app.start();
 
-        })();
+        }))();
 
     </script>
 

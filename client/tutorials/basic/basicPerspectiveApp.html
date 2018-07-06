@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="/deps/highlightjs/styles/darkula.css">
     <link rel="stylesheet" href="/styles/styles.css">
 
+    <script src="/scripts/codePrinter.js"></script>
 
     <script src="/deps/highlightjs/highlight.pack.min.js"></script>
     <script src="/deps/dat.gui/build/dat.gui.min.js"></script>
@@ -26,33 +27,7 @@
 
   </head>
 
-  <script type="text/javascript">
-
-    function onPageLoaded() {
-      initaliseApp1();
-    }
-
-    function initaliseApp1() {
-
-        var appElement = document.getElementById("app1");
-
-        console.log(Peanuts.Three.App);
-
-        var app = new Peanuts.Three.App.Builder(appElement)
-                 .withGLRenderer()
-                 .withPerspectiveView()
-                 .withStats()
-                 .build();
-
-        app.start();
-
-    }
-
-  </script>
-
-  <script type="text/javascript">hljs.initHighlightingOnLoad();</script>
-
-  <body class="page" onload="onPageLoaded()">
+  <body class="page">
 
     <div class="container">
 
@@ -60,10 +35,13 @@
 
       <div id="app1" class="threeApp"></div>
 
-      <pre>
-        <code>
+      <script type="text/javascript">
+
+        (CodePrinter.printAndRun(function() {
+
             // Find the div on the page you would like the application to appear in.
-            var appElement = document.getElementById("app");
+            var appElement = document.getElementById("app1");
+
 
             // Configure your application, here we are asking for a WebGL window
             // with a perspective view, by default Peanuts will create a default
@@ -72,17 +50,21 @@
             var app = new Peanuts.Three.App.Builder(appElement)
                      .withGLRenderer()
                      .withPerspectiveView()
+                     .withStats()
                      .build();
 
             // This tells the engine to start running and render your stuff.
             // In this case it's just to draw a few shapes :P but it gets more 
             // exciting, I promise :)
             app.start();
-        </code>
-      </pre>
+
+        }))();
+
+      </script>
 
     </div>
 
   </body>
+
 
 </html>
