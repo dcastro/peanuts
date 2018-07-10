@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="/deps/highlightjs/styles/darkula.css">
     <link rel="stylesheet" href="/styles/styles.css">
 
+    <script src="/scripts/codePrinter.js"></script>
+
     <script src="/deps/highlightjs/highlight.pack.min.js"></script>
     <script src="/deps/dat.gui/build/dat.gui.min.js"></script>
     <script src="/deps/stats-js/build/stats.min.js"></script>
@@ -29,126 +31,132 @@
 
     <style type="text/css">
         .threeApp {
-            height: 800px;
+            height: 440px;
         }
     </style>
 
 </head>
 
-<script type="text/javascript">hljs.initHighlightingOnLoad();</script>
+    <body class="page">
 
-<body class="page">
+        <div class="container">
 
-<div class="container">
+            <h1>Earth Demo</h1>
 
-    <h1>Earth Demo</h1>
+            <h2>Sphere Geometry</h2>
 
-    <h2>Sphere Geometry</h2>
+            <div id="appEarth" class="threeApp"></div>
 
-    <div id="appEarth" class="threeApp"></div>
+            <script type="text/javascript">
 
-    <script type="text/javascript">
+                (CodePrinter.printAndRun(function() {
 
-        (function setup() {
+                    var app = new Peanuts.Three.App.Factory(
+                        document.getElementById("appEarth")
+                    ).createDemoGLPerspectiveApp();
 
-            var app = new Peanuts.Three.App.Factory(
-                document.getElementById("appEarth")
-            ).createDemoGLPerspectiveApp();
-
-
-            var demoSettings =  {
-                light : {
-                    position: new THREE.Vector3(-55,50,-60),
-                    color :  new THREE.Color(0xFFFFFF),
-                    intensity : 1
-                }, 
-                globe : {
-                    geometry: {
-                        radius : 50,
-                        widthSegments : 128,
-                        heightSegments : 128
-                    },
-                    material: {
-                        opacity: 1,
-                        wireframe : false,
-                        color :  new THREE.Color(0xFFFFFF),
-                        map: "textures/earth/earthmap1k.jpg",
-                        bumpMap: "textures/earth/earthbump1k.jpg",
-                        specularMap: "textures/earth/earthspec1k.jpg",
-                    }
-                }
-            };
-
-            function createScene(demoSettings) {
-
-                var ambientLight = new THREE.AmbientLight(0x999999);
-
-                var lightDirectional = new THREE.DirectionalLight(
-                    demoSettings.light.color,
-                    demoSettings.light.intensity
-                );
-
-                lightDirectional.position.copy(demoSettings.light.position);
-
-                var lightDirectionalHelper = new THREE.DirectionalLightHelper(lightDirectional, 2);
-
-                var sphereGeometry = new THREE.SphereGeometry(
-                    demoSettings.globe.geometry.radius,
-                    demoSettings.globe.geometry.widthSegments,
-                    demoSettings.globe.geometry.heightSegments
-                );
-
-                var sphereMaterial = new THREE.MeshPhongMaterial({
-                    color: new THREE.Color(demoSettings.globe.material.color),
-                    wireframe: demoSettings.globe.material.wireframe,
-                    opacity: demoSettings.globe.material.opacity
-                });
-
-                var sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
-
-                var setTexture = function(material, toSet) {
-                    return function(texture) {
-                        material[toSet] = texture;
-                        material.needsUpdate = true;
-                        texture.minFilter = THREE.LinearFilter;
+                    var demoSettings =  {
+                        light : {
+                            position: new THREE.Vector3(-55,50,-60),
+                            color :  new THREE.Color(0xFFFFFF),
+                            intensity : 1
+                        }, 
+                        globe : {
+                            geometry: {
+                                radius : 50,
+                                widthSegments : 128,
+                                heightSegments : 128
+                            },
+                            material: {
+                                opacity: 1,
+                                wireframe : false,
+                                color :  new THREE.Color(0xFFFFFF),
+                                map: "textures/earth/earthmap1k.jpg",
+                                bumpMap: "textures/earth/earthbump1k.jpg",
+                                specularMap: "textures/earth/earthspec1k.jpg",
+                            }
+                        }
                     };
-                };
 
-                app.loader.texture.load(demoSettings.globe.material.map, setTexture(sphereMaterial, "map"));
-                app.loader.texture.load(demoSettings.globe.material.bumpMap, setTexture(sphereMaterial, "bumpMap"));
-                //app.loader.texture.load( demoSettings.globe.material.specularMap, setTexture(sphereMaterial, "specularMap"));
+                    function createScene(demoSettings) {
 
-                app.view.camera.position.set(0,0, demoSettings.globe.geometry.radius * -3);
-                app.view.controls.enableRotate = false;
-                app.view.controls.enabledZoom = true;
-                app.view.controls.enablePan = false;
-                app.view.controls.update();
+                        var ambientLight = new THREE.AmbientLight(0x444444);
 
-                app.inputs.mouse.events.onMouseMove.add(function(mouseState) {
-                    if( mouseState.pressed) {
-                        sphereMesh.rotateY(25 * mouseState.deltaPosNX);
+                        var lightDirectional = new THREE.DirectionalLight(
+                            demoSettings.light.color,
+                            demoSettings.light.intensity
+                        );
+
+                        lightDirectional.position.copy(demoSettings.light.position);
+
+                        var lightDirectionalHelper = new THREE.DirectionalLightHelper(lightDirectional, 2);
+
+                        var sphereGeometry = new THREE.SphereGeometry(
+                            demoSettings.globe.geometry.radius,
+                            demoSettings.globe.geometry.widthSegments,
+                            demoSettings.globe.geometry.heightSegments
+                        );
+
+                        var sphereMaterial = new THREE.MeshPhongMaterial({
+                            color: new THREE.Color(demoSettings.globe.material.color),
+                            wireframe: demoSettings.globe.material.wireframe,
+                            opacity: demoSettings.globe.material.opacity
+                        });
+
+                        var sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
+
+                        var setTexture = function(material, toSet) {
+                            return function(texture) {
+                                material[toSet] = texture;
+                                material.needsUpdate = true;
+                                texture.minFilter = THREE.LinearFilter;
+                            };
+                        };
+
+                        app.loader.texture.load(
+                            demoSettings.globe.material.map, 
+                            setTexture(sphereMaterial, "map")
+                        );
+
+                        app.loader.texture.load(
+                            demoSettings.globe.material.bumpMap, 
+                            setTexture(sphereMaterial, "bumpMap")
+                        );
+
+                        app.loader.texture.load(
+                            demoSettings.globe.material.specularMap, 
+                            setTexture(sphereMaterial, "specularMap")
+                        );
+
+                        app.view.camera.position.set(0,0, demoSettings.globe.geometry.radius * -5);
+
+                        app.view.controls.enableRotate = false;
+                        app.view.controls.enabledZoom = true;
+                        app.view.controls.enablePan = false;
+                        app.view.controls.update();
+
+                        app.inputs.mouse.events.onMouseMove.add(function(mouseState) {
+                            if( mouseState.pressed) {
+                                sphereMesh.rotateY(25 * mouseState.deltaPosNX);
+                            }
+                        });
+
+                        app.view.setScene(new THREE.Scene());
+
+                        app.view.scene.background = new THREE.Color(0,0x000000);
+                        app.view.scene.add(app.view.camera);
+                        app.view.scene.add(ambientLight);
+                        app.view.scene.add(lightDirectional);
+                        app.view.scene.add(sphereMesh);
                     }
-                });
 
-                app.view.setScene(new THREE.Scene());
+                    createScene(demoSettings);
 
-                app.view.scene.add(app.view.camera);
-                app.view.scene.add(ambientLight);
-                app.view.scene.add(lightDirectional);
-                app.view.scene.add(sphereMesh);
-            }
+                    app.start();
 
-            createScene(demoSettings);
+                }))();
 
-            app.start();
-
-        })();
-
-    </script>
-
-
-</div>
-
-</body>
-
+            </script>
+        </div>
+    </body>
 </html>
