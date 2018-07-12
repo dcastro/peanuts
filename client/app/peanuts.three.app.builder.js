@@ -25,14 +25,17 @@ Peanuts.Three.App.Builder = function (Peanuts) {
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
-    AppBuilder.prototype.withGLRenderer = function () {
+    AppBuilder.prototype.withGLRenderer = function (config) {
 
         this.app.setRenderer(
-            new THREE.WebGLRenderer({
+            new THREE.WebGLRenderer(config || {
+                clearColor: 0xFFFFFF,
                 antialias: true,
                 alpha: true
             })
         );
+
+        this.app.renderer.setClearColor(0x000000);
 
         return this;
     };
