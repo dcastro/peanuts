@@ -111,6 +111,8 @@ Peanuts.Three.App.App = function (Peanuts) {
     //////////////////////////////////////////////////////////
     App.prototype.start = function () {
 
+        this.view.controls.update();
+
         this.driver.start();
 
         return this;
