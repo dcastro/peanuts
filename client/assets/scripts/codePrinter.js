@@ -1,6 +1,6 @@
 var CodePrinter = new function() {
 
-	this.printAndRun = function(func){
+	this.printAndRun = function(func, args){
       var scriptTag = document.scripts[document.scripts.length - 1];
       var parentTag = scriptTag.parentNode;
       var entire = func.toString();
@@ -8,7 +8,7 @@ var CodePrinter = new function() {
       element.innerHTML = "<code>" + entire.slice(entire.indexOf("{") + 1, entire.lastIndexOf("CodePrinter")) + "</code>";
       scriptTag.parentNode.insertBefore(element,scriptTag);
       hljs.initHighlightingOnLoad();
-      func();
+      func.call(func,args);
     }
 
     return this;

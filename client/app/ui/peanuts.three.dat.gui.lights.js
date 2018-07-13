@@ -18,6 +18,30 @@ Peanuts.Three.DatGui.Helpers.Lights = function(Peanuts) {
 
     }
 
+
+    //////////////////////////////////////////////////////////
+    //
+    //////////////////////////////////////////////////////////
+    var AmbientLightSettingsUIHelper = {
+
+        defaults: {
+            color:"#ffffff"
+        },
+
+        add : function (gui, settings, options, onChange) {
+            
+            settings = Peanuts.Peanut.mixin(this.defaults, settings);
+            options = Peanuts.Peanut.mixin(this.defaults, options);
+
+            var controllers = [];
+
+            controllers.push(gui.addColor(settings, 'color'));
+
+            onChangeMapper(controllers, onChange, settings);
+        }
+
+    };
+
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
@@ -51,6 +75,7 @@ Peanuts.Three.DatGui.Helpers.Lights = function(Peanuts) {
     };
 
     return {
+        Ambient: AmbientLightSettingsUIHelper,
         Directional: DirectionalLightSettingsUIHelper
     };
 

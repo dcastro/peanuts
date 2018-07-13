@@ -2,44 +2,85 @@ Peanuts.Three.Charts = Peanuts.Three.Charts || {}
 
 Peanuts.Three.Charts.PieChart = function () {
 
-	PieChart(config) { 
+    //////////////////////////////////////////////////////////
+    //
+    //////////////////////////////////////////////////////////
+	function PieChart(data, config, providers) { 
 	
-		this.data = [];
-		
-		this.config = config || {
-			radius : 10; 
-			depth: 5
-		};
-
 		this.renderable = new THREE.Group();
 
+		this.renderable.rotateZ(THREE.Math.degToRad(180));
+		this.renderable.rotateX(THREE.Math.degToRad(90));
+
+		this.config = Object.assign({
+			radius : 1,
+			depth: 0.5
+		},config);
+
+		this.providers = Object.assign({
+			geometry : new BasicCylinderGeometryProvider(),
+			material : new Peanuts.Three.Charts.MatProviders.BasicMeshMaterialProvider(['red', 'green', 'blue'])
+		}, providers );
+
+		this.update(data);
 	}
 
-	PieChart.prototype.setMaterialProvider(provider) {
-		this.materialProvider = provider;
+    //////////////////////////////////////////////////////////
+    //
+    //////////////////////////////////////////////////////////
+	PieChart.prototype.update = function(data) {
+
+		var self = this;
+
+		self.data = data || [1];
+
+		self.total = self.data.reduce(
+			function(acc, val) { 
+				return acc + val; 
+			}
+		);
+
+		var startRads = 0;
+		var unitRads = 360 / self.total;
+
+		self.data.forEach(function(item, index) {
+
+			var sizeRads = (item * unitRads);
+
+            self.renderable.add(
+            	new THREE.Mesh(
+            		self.providers.geometry(self, index, startRads, sizeRads),
+            		self.providers.material(self, index)
+            	)
+            );
+
+            startRads += sizeRads;
+		});
 	}
 
-	PieChart.prototype.setData = function(data) {
 
-		if( data ) {
+    //////////////////////////////////////////////////////////
+    //
+    //////////////////////////////////////////////////////////
+	function BasicCylinderGeometryProvider() {
 
-			var total = (data  || [1]).reduce(
-				function(acc, val) { 
-					return acc + val; 
-				}
-			);
+		var self = this;
 
-			this.data = new Array(data.length);
+		return function(chart, index, startDeg, sizeDeg) {
 
-			data.forEach(function(item) {
-
-				
-			})
-
+            return new THREE.CylinderGeometry(
+                chart.config.radius,	
+                chart.config.radius,
+                chart.config.depth,
+                30,
+                1,
+                false,
+                THREE.Math.degToRad(startDeg),
+                THREE.Math.degToRad(sizeDeg)
+            );
 		}
-
 	}
-
+	
 	return PieChart;
 
 }(Peanuts)

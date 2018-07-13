@@ -85,7 +85,22 @@ Peanuts.Three.App.App = function (Peanuts) {
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
+    App.prototype.onUpdate = function (func) {
+
+        this.updateDelegate = func;
+        
+        return this;
+    };
+
+
+    //////////////////////////////////////////////////////////
+    //
+    //////////////////////////////////////////////////////////
     App.prototype.update = function () {
+
+        if (this.updateDelegate) {
+            this.updateDelegate();
+        }
 
         if (this.view && this.view.update) {
             this.view.update();

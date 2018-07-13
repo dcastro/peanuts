@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/deps/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" href="/deps/highlightjs/styles/darkula.css">
-    <link rel="stylesheet" href="/styles/styles.css">
+    <link rel="stylesheet" href="/assets/styles/styles.css">
+    
+    <script src="/assets/scripts/codePrinter.js"></script>
 
     <script src="/deps/highlightjs/highlight.pack.min.js"></script>
     <script src="/deps/dat.gui/build/dat.gui.min.js"></script>
@@ -24,18 +26,18 @@
     <script src="/app/peanuts.three.app.factory.js"></script>
     <script src="/app/peanuts.three.view.js"></script>
     <script src="/app/peanuts.three.view.builder.js"></script>
-    <script src="/app/peanuts.three.dat.gui.js"></script>
     <script src="/app/peanuts.three.charts.js"></script>
+    <script src="/app/peanuts.three.charts.pie.js"></script>
+    <script src="/app/ui/peanuts.three.dat.gui.lights.js"></script>
+    <script src="/app/ui/peanuts.three.dat.gui.materials.js"></script>
 
     <style type="text/css">
-        .tutorialApp {
+        .threeApp {
             height: 300px;
         }
     </style>
 
 </head>
-
-<script type="text/javascript">hljs.initHighlightingOnLoad();</script>
 
 <body class="page">
 
@@ -43,32 +45,82 @@
 
     <h1>Basic Charts</h1>
 
-    <h2>Timeseries</h2>
+    <h2>Pie Chart</h2>
 
-    <div id="appSphere" class="tutorialApp"></div>
+    <div id="app" class="threeApp"></div>
 
     <script type="text/javascript">
 
-        (function setup() {
+        (CodePrinter.printAndRun(function(initUI) {
 
+            var Charts = Peanuts.Three.Charts;
+
+            // Create a new Peanuts app
             var app = new Peanuts.Three.App.Factory(
-                document.getElementById("appSphere")
-            ).createDemoGLorthographicApp();
+                document.getElementById("app")
+            ).createDemoGLPerspectiveApp();
 
-            function createScene(demoSettings) {
+            // Create a new Pie Chart
+            var chart = new Charts.PieChart([10,10,10], {}, {
+                    material : new Charts.MatProviders.BasicLambertMaterialProvider(
+                        ['red', 'green', 'blue']
+                    )
+                }
+            );
 
-                var chart = new Charts.Timeseries(function genDatata() {});
+            app.view.setScene(new THREE.Scene());   //Create the scene
+            app.view.scene.add(chart.renderable);   //Add the chat renderable
 
-                app.view.setScene(new THREE.Scene());
+            app.view.camera.position.set(0,0, -5);  //Move the camera back a bit
 
-                app.view.scene.add(chart);
+            app.start(); // Start the app
+
+            initUI(app); //Ignore me, demo menu initalisation
+
+        }, function(app) {
+
+                var directionalLight = app.view.scene.addIt(new THREE.DirectionalLight(0xFFFFFF));
+                var directionalLightHelper = app.view.scene.addIt(new THREE.DirectionalLightHelper(directionalLight, 2));
+                var ambientLight = app.view.scene.addIt(new THREE.AmbientLight(0xFFFFFF));
+
+                directionalLightHelper.update();
+
+                Peanuts.Three.DatGui.Helpers.Lights.Ambient.add(
+                    app.datGui.addFolder("AmbientLight"), {
+                        color: 0xFFFFFF
+                    }, {},  
+                    function(lightSettings) {
+                        directionalLight.color =  new THREE.Color(lightSettings.color);
+                    }
+                );
+
+                Peanuts.Three.DatGui.Helpers.Lights.Directional.add(
+                    app.datGui.addFolder("DirectionalLight"), {
+                        color: 0xFFFFFF,
+                        intensity: 1,
+                        distance: 3.5,
+                        phi: 2,
+                        theta: 4
+                    }, {},  
+                    function(lightSettings) {
+                        directionalLight.color =  new THREE.Color(lightSettings.color);
+                        directionalLight.intensity = lightSettings.intensity;
+                        directionalLight.position.setFromSpherical(
+                            new THREE.Spherical(
+                                lightSettings.distance,
+                                lightSettings.phi,
+                                lightSettings.theta
+                            )
+                        );
+                        directionalLightHelper.update();
+                    }
+                );
             }
-
-            app.start();
-
-        })();
+        ))();
 
     </script>
+
+</div>
 
 </body>
 

@@ -28,6 +28,13 @@ Peanuts.Three.View.View = function (Peanuts) {
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
+    View.prototype.onUpdate = function(func) {
+        this.updateDelegate = func;
+    }
+
+    //////////////////////////////////////////////////////////
+    //
+    //////////////////////////////////////////////////////////
     View.prototype.setCameraControls = function (controls) {
 
         this.controls = controls;
@@ -67,6 +74,10 @@ Peanuts.Three.View.View = function (Peanuts) {
     View.prototype.setScene = function (scene) {
 
         this.scene = scene;
+        this.scene.addIt = function(obj) {
+            this.add(obj);
+            return obj;
+        }
 
         return this;
     };
@@ -75,6 +86,10 @@ Peanuts.Three.View.View = function (Peanuts) {
     //
     //////////////////////////////////////////////////////////
     View.prototype.update = function () {
+
+        if (this.updateDelegate) {
+            this.updateDelegate(this);
+        }
 
         return this;
     };

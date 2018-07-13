@@ -28,7 +28,7 @@ Peanuts.Three.App.Factory = function (Peanuts) {
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
-    AppFactory.prototype.createDemoGLOrthograpicApp = function (container) {
+    AppFactory.prototype.createDemoGLOrthographicApp = function (container) {
 
         var app = this.appBuilder
             .withGLRenderer()
