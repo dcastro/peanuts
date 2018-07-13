@@ -9,7 +9,7 @@ Peanuts.Three.Charts = function () {
 
 		var self = this;
 
-		return function(chart, index) {
+		return function(chart, index, data) {
 			return new THREE.MeshBasicMaterial({
 				wireframe: false,
 	            color: colors[index]
@@ -24,7 +24,7 @@ Peanuts.Three.Charts = function () {
 
 		var self = this;
 
-		return function(chart, index) {
+		return function(chart, index, data) {
 			return new THREE.MeshLambertMaterial({
 				wireframe: false,
 	            color: colors[index]
@@ -34,8 +34,8 @@ Peanuts.Three.Charts = function () {
 
 	return {
 		MatProviders : {
-			BasicMeshMaterialProvider : BasicMeshMaterialProvider,
-			BasicLambertMaterialProvider : BasicLambertMaterialProvider
+			BasicMeshProvider : BasicMeshMaterialProvider,
+			BasicLambertProvider : BasicLambertMaterialProvider
 		}
 	};
 

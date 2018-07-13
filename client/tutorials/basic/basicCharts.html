@@ -54,6 +54,7 @@
         (CodePrinter.printAndRun(function(initUI) {
 
             var Charts = Peanuts.Three.Charts;
+            var MatProviders = Charts.MatProviders;
 
             // Create a new Peanuts app
             var app = new Peanuts.Three.App.Factory(
@@ -62,7 +63,7 @@
 
             // Create a new Pie Chart
             var chart = new Charts.PieChart([10,10,10], {}, {
-                    material : new Charts.MatProviders.BasicLambertMaterialProvider(
+                    material : MatProviders.BasicLambertProvider(
                         ['red', 'green', 'blue']
                     )
                 }

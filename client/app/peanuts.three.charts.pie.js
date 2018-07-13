@@ -2,6 +2,8 @@ Peanuts.Three.Charts = Peanuts.Three.Charts || {}
 
 Peanuts.Three.Charts.PieChart = function () {
 
+	var MatProviders = Peanuts.Three.Charts.MatProviders;
+
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
@@ -19,7 +21,7 @@ Peanuts.Three.Charts.PieChart = function () {
 
 		this.providers = Object.assign({
 			geometry : new BasicCylinderGeometryProvider(),
-			material : new Peanuts.Three.Charts.MatProviders.BasicMeshMaterialProvider(['red', 'green', 'blue'])
+			material : new MatProviders.BasicLambertProvider(['red', 'green', 'blue'])
 		}, providers );
 
 		this.update(data);
@@ -50,7 +52,7 @@ Peanuts.Three.Charts.PieChart = function () {
             self.renderable.add(
             	new THREE.Mesh(
             		self.providers.geometry(self, index, startRads, sizeRads),
-            		self.providers.material(self, index)
+            		self.providers.material(self, index, item)
             	)
             );
 
@@ -80,7 +82,7 @@ Peanuts.Three.Charts.PieChart = function () {
             );
 		}
 	}
-	
+
 	return PieChart;
 
 }(Peanuts)
