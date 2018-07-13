@@ -55,6 +55,8 @@
             ).createDemoGLPerspectiveApp();
 
             function createScene(demoSettings) {
+ 
+                app.view.setScene(new THREE.Scene());
 
                 var sphereGeometry = new THREE.SphereGeometry(
                     demoSettings.radius,
@@ -72,8 +74,6 @@
                 });
 
                 var sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
-
-                app.view.setScene(new THREE.Scene());
 
                 app.view.scene.add(sphereMesh);
             }

@@ -53,8 +53,8 @@
 
         (CodePrinter.printAndRun(function(initUI) {
 
-            var Charts = Peanuts.Three.Charts;
-            var MatProviders = Charts.MatProviders;
+            var Charts = Peanuts.Three.Charts;          //Alias for brevity
+            var MatProviders = Charts.MatProviders;     //Alias for brevity
 
             // Create a new Peanuts app
             var app = new Peanuts.Three.App.Factory(
@@ -71,7 +71,6 @@
 
             app.view.setScene(new THREE.Scene());   //Create the scene
             app.view.scene.add(chart.renderable);   //Add the chat renderable
-
             app.view.camera.position.set(0,0, -5);  //Move the camera back a bit
 
             app.start(); // Start the app
@@ -83,8 +82,6 @@
                 var directionalLight = app.view.scene.addIt(new THREE.DirectionalLight(0xFFFFFF));
                 var directionalLightHelper = app.view.scene.addIt(new THREE.DirectionalLightHelper(directionalLight, 2));
                 var ambientLight = app.view.scene.addIt(new THREE.AmbientLight(0xFFFFFF));
-
-                directionalLightHelper.update();
 
                 Peanuts.Three.DatGui.Helpers.Lights.Ambient.add(
                     app.datGui.addFolder("AmbientLight"), {

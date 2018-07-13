@@ -21,7 +21,7 @@ Peanuts.Three.Charts.PieChart = function () {
 
 		this.providers = Object.assign({
 			geometry : new BasicCylinderGeometryProvider(),
-			material : new MatProviders.BasicLambertProvider(['red', 'green', 'blue'])
+			material : new MatProviders.BasicColorProvider(['red', 'green', 'blue'])
 		}, providers );
 
 		this.update(data);

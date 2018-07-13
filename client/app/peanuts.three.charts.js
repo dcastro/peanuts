@@ -32,9 +32,26 @@ Peanuts.Three.Charts = function () {
 		}
 	}
 
+
+	//////////////////////////////////////////////////////////
+    //
+    //////////////////////////////////////////////////////////
+	function BasicPhongMaterialProvider(colors, textures) {
+
+		var self = this;
+
+		return function(chart, index, data) {
+			return new THREE.MeshLambertMaterial({
+				wireframe: false,
+	            color: colors[index]
+	        });
+		}
+	}
+
+
 	return {
 		MatProviders : {
-			BasicMeshProvider : BasicMeshMaterialProvider,
+			BasicColorProvider : BasicMeshMaterialProvider,
 			BasicLambertProvider : BasicLambertMaterialProvider
 		}
 	};

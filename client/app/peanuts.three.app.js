@@ -58,6 +58,8 @@ Peanuts.Three.App.App = function (Peanuts) {
         this.domElement.appendChild(this.renderer.domElement);
 
         onAppReSized(this);
+
+        return this;
     }
 
     //////////////////////////////////////////////////////////
@@ -68,6 +70,8 @@ Peanuts.Three.App.App = function (Peanuts) {
         this.view = view;
 
         onAppReSized(this);
+
+        return this;
     }
 
     //////////////////////////////////////////////////////////
