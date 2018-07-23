@@ -16,7 +16,7 @@ Peanuts.Three.Charts.PieChart = function () {
 
 		this.config = Object.assign({
 			radius : 1,
-			depth: 0.5
+			height: 0.5
 		},config);
 
 		this.providers = Object.assign({
@@ -73,7 +73,7 @@ Peanuts.Three.Charts.PieChart = function () {
             return new THREE.CylinderGeometry(
                 chart.config.radius,	
                 chart.config.radius,
-                chart.config.depth,
+                chart.config.height,
                 30,
                 1,
                 false,

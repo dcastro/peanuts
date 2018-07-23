@@ -27,7 +27,7 @@
     <script src="/app/peanuts.three.view.js"></script>
     <script src="/app/peanuts.three.view.builder.js"></script>
     <script src="/app/peanuts.three.charts.js"></script>
-    <script src="/app/peanuts.three.charts.pie.js"></script>
+    <script src="/app/peanuts.three.charts.bar.js"></script>
     <script src="/app/ui/peanuts.three.dat.gui.lights.js"></script>
     <script src="/app/ui/peanuts.three.dat.gui.materials.js"></script>
 
@@ -45,7 +45,7 @@
 
     <h1>Basic Charts</h1>
 
-    <h2>Pie Chart</h2>
+    <h2>Bar Chart</h2>
 
     <div id="app" class="threeApp"></div>
 
@@ -62,8 +62,8 @@
             ).createDemoGLPerspectiveApp();
 
             // Create a new Pie Chart
-            var chart = new Charts.PieChart([10,10,10], {}, {
-                    material : MatProviders.BasicLambertProvider(
+            var chart = new Charts.BarChart([6,2,3], {}, {
+                    material : MatProviders.BasicPhongProvider(
                         ['red', 'green', 'blue']
                     )
                 }
@@ -71,16 +71,17 @@
 
             app.view.setScene(new THREE.Scene());   //Create the scene
             app.view.scene.add(chart.renderable);   //Add the chat renderable
-            app.view.camera.position.set(0,0, -5);  //Move the camera back a bit
-
+            app.view.camera.position.set(0,0,10);  //Move the camera back a bit
             app.start(); // Start the app
 
             initUI(app); //Ignore me, demo menu initalisation
 
         }, function(app) {
 
-                var directionalLight = app.view.scene.addIt(new THREE.DirectionalLight(0xFFFFFF));
-                var directionalLightHelper = app.view.scene.addIt(new THREE.DirectionalLightHelper(directionalLight, 2));
+                var directionalLight = app.view.scene.addIt(new THREE.PointLight(0xFFFFFF), 2, 1 );
+
+                var lightDirectionalHelper = app.view.scene.addIt(new THREE.PointLightHelper(directionalLight, 2));
+
                 var ambientLight = app.view.scene.addIt(new THREE.AmbientLight(0xFFFFFF));
 
                 Peanuts.Three.DatGui.Helpers.Lights.Ambient.add(
@@ -95,10 +96,10 @@
                 Peanuts.Three.DatGui.Helpers.Lights.Directional.add(
                     app.datGui.addFolder("DirectionalLight"), {
                         color: 0xFFFFFF,
-                        intensity: 1,
-                        distance: 3.5,
-                        phi: 2,
-                        theta: 4
+                        intensity: 4,
+                        distance: 4,
+                        phi: 5.3,
+                        theta: 3
                     }, {},  
                     function(lightSettings) {
                         directionalLight.color =  new THREE.Color(lightSettings.color);
@@ -110,7 +111,7 @@
                                 lightSettings.theta
                             )
                         );
-                        directionalLightHelper.update();
+                        lightDirectionalHelper.update();
                     }
                 );
             }
