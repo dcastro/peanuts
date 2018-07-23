@@ -20,7 +20,13 @@ Peanuts.Three.Charts.BarChart = function () {
 
 		this.providers = Object.assign({
 			geometry : new BasicBarGeometryProvider(),
-			material : new MatProviders.BasicColorProvider(['red', 'green','blue'])
+			material : new MatProviders.BasicPhongProvider([
+				"rgba(30, 145, 214, 1)",
+				"rgba(0, 114, 187, 1)",
+				"rgba(228, 204, 55, 1)",
+				"rgba(140, 198, 63, 1)",
+				"rgba(225, 131, 53, 1)"
+			])
 		}, providers );
 
 		this.update(data);

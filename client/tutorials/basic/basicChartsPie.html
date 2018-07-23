@@ -62,10 +62,10 @@
             ).createDemoGLPerspectiveApp();
 
             // Create a new Pie Chart
-            var chart = new Charts.PieChart([10,10,10], {}, {
-                    material : MatProviders.BasicLambertProvider(
-                        ['red', 'green', 'blue']
-                    )
+            var chart = new Charts.PieChart([10,10,5,10,5], {}, {
+                    // material : MatProviders.BasicPhongProvider(
+                    //     ['red', 'green', 'blue']
+                    // )
                 }
             );
 
@@ -94,7 +94,7 @@
                 Peanuts.Three.DatGui.Helpers.Lights.Directional.add(
                     app.datGui.addFolder("DirectionalLight"), {
                         color: 0xFFFFFF,
-                        intensity: 4,
+                        intensity: 0.6,
                         distance: 2,
                         phi: 5.3,
                         theta: 3
