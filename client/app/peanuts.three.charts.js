@@ -12,7 +12,7 @@ Peanuts.Three.Charts = function () {
 		return function(chart, index, data) {
 			return new THREE.MeshBasicMaterial({
 				wireframe: false,
-	            color: colors[index]
+	            color: colors[index % colors.length]
 	        });
 		}
 	}
@@ -27,7 +27,7 @@ Peanuts.Three.Charts = function () {
 		return function(chart, index, data) {
 			return new THREE.MeshLambertMaterial({
 				wireframe: false,
-	            color: colors[index]
+	            color: colors[index % colors.length]
 	        });
 		}
 	}
@@ -43,7 +43,7 @@ Peanuts.Three.Charts = function () {
 		return function(chart, index, data) {
 			return new THREE.MeshPhongMaterial({
 				wireframe: false,
-	            color: colors[index]
+	            color: colors[index % colors.length]
 	        });
 		}
 	}

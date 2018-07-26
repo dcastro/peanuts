@@ -27,12 +27,14 @@
     <script src="/app/peanuts.three.app.factory.js"></script>
     <script src="/app/peanuts.three.view.js"></script>
     <script src="/app/peanuts.three.view.builder.js"></script>
-    <script src="/app/ui/peanuts.three.dat.gui.js"></script>
-    <script src="/app/ui/peanuts.three.dat.gui.geometry.js"></script>
+    <script src="/app/peanuts.three.charts.js"></script>
+    <script src="/app/peanuts.three.charts.candle.js"></script>
+    <script src="/app/ui/peanuts.three.dat.gui.lights.js"></script>
+    <script src="/app/ui/peanuts.three.dat.gui.materials.js"></script>
 
     <style type="text/css">
         .threeApp {
-            height: 640px;
+            height: 400;
         }
     </style>
 
@@ -50,7 +52,10 @@
 
             <script type="text/javascript">
 
-                (CodePrinter.printAndRun(function() {
+                (CodePrinter.printAndRun(function(initUI) {
+
+                    var Charts = Peanuts.Three.Charts;          //Alias for brevity
+                    var MatProviders = Charts.MatProviders;     //Alias for brevity
 
                     var app = new Peanuts.Three.App.Factory(
                         document.getElementById("app")
@@ -58,71 +63,84 @@
 
 
                     var demoSettings  = {
-                        chartHeight : 100
+                        chartHeight : 50
                     };
-
-                    function ChartFactory(chartSettings) {
-                        this.chartSettings = chartSettings;
-                    }
-
-                    ChartFactory.create = function (candleData) {
-
-                        var createCandle = function (open, close, high, low, volume) {
-                            return new THREE.Mesh(
-                                new THREE.BoxGeometry(
-                                    10,                         //width
-                                    (open - close),             //height
-                                    10,                         //depth
-                                    1,                          //width segments
-                                    1,                          //height sehments
-                                    1                           //depth segments
-                                ), 
-                                new THREE.MeshBasicMaterial({
-                                    wireframe: true,
-                                    color: 0x00ff00
-                                })
-                            );
-                        };
-
-                        var maxPrice = candleData.reduce(
-                                        function (acc, value, i) {
-                                            console.log('reducting',value);
-                                            return Math.max(acc,value[2]);
-                                       });
-
-                        return candleFactory.createCandle(10,10,10,10,10);
-                    }
 
                     function createScene(candleData) {
 
-                        var ambientLight = new THREE.AmbientLight(0x444444);
+                        // Create a new Candle Chart
+                        var chart = new Charts.CandleChart(candleData, {
+                            height : 1000,
+                            width: 2000,
+                            depth: 100
+                        });
 
-                        var chartFactory = new ChartFactory();
-
-                        var chart = chartFactory.create(candleData);
-
-                        app.view.camera.position.set(0,0, -50);
-
-                        app.view.setScene(new THREE.Scene());
-                        app.view.scene.add(app.view.camera);
-                        app.view.scene.add(ambientLight);
-                        app.view.scene.add(chart);
+                        app.view.setScene(new THREE.Scene());   //Create the scene
+                        app.view.scene.add(chart.renderable);   //Add the chat renderable
+                        app.view.camera.position.set(0,0,-400);  //Move the camera back a bit
                     }
 
                     var candleFetcher = new Candles();
 
-                    candleFetcher.fetch("ETH-USD", 60*60, "2018-07-01","2018-07-12", 
+                    candleFetcher.fetch("ETH-USD", 60*60*24, "2018-01-01","2018-07-01", 
                         function(candleData) {
                             createScene(
-                                demoSettings, 
-                                candleData
+                                candleData.map(function(item) {
+                                    return {
+                                        min: item[1],
+                                        max: item[2],
+                                        open: item[3],
+                                        close: item[4] 
+                                    };
+                                })
                             );
                         }
                     );
 
                     app.start();
 
-                }))();
+                    initUI(app); //Ignore me, demo menu initalisation
+
+                }, function(app) {
+
+                        var directionalLight = app.view.scene.addIt(new THREE.PointLight(0xFFFFFF), 2, 1 );
+
+                        var lightDirectionalHelper = app.view.scene.addIt(new THREE.PointLightHelper(directionalLight, 2));
+
+                        var ambientLight = app.view.scene.addIt(new THREE.AmbientLight(0xFFFFFF));
+
+                        Peanuts.Three.DatGui.Helpers.Lights.Ambient.add(
+                            app.datGui.addFolder("AmbientLight"), {
+                                color: 0xFFFFFF
+                            }, {},  
+                            function(lightSettings) {
+                                directionalLight.color =  new THREE.Color(lightSettings.color);
+                            }
+                        );
+
+                        Peanuts.Three.DatGui.Helpers.Lights.Directional.add(
+                            app.datGui.addFolder("DirectionalLight"), {
+                                color: 0xFFFFFF,
+                                intensity: 0.6,
+                                distance: 4,
+                                phi: 5.3,
+                                theta: 3
+                            }, {},  
+                            function(lightSettings) {
+                                directionalLight.color =  new THREE.Color(lightSettings.color);
+                                directionalLight.intensity = lightSettings.intensity;
+                                directionalLight.position.setFromSpherical(
+                                    new THREE.Spherical(
+                                        lightSettings.distance,
+                                        lightSettings.phi,
+                                        lightSettings.theta
+                                    )
+                                );
+                                lightDirectionalHelper.update();
+                            }
+                        );
+                    }
+                ))();
 
             </script>
         </div>

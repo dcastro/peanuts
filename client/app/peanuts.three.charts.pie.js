@@ -20,7 +20,7 @@ Peanuts.Three.Charts.PieChart = function () {
 		},config);
 
 		this.providers = Object.assign({
-			geometry : new BasicCylinderGeometryProvider(),
+			geometry : new BasicCylinderProvider(),
 			material : new MatProviders.BasicPhongProvider([
 				"rgba(30, 145, 214, 1)",
 				"rgba(0, 114, 187, 1)",
@@ -48,21 +48,21 @@ Peanuts.Three.Charts.PieChart = function () {
 			}
 		);
 
-		var startRads = 0;
-		var unitRads = 360 / self.total;
+		var startAngle = 0;
+		var unitAngle = 360 / self.total;
 
 		self.data.forEach(function(item, index) {
 
-			var sizeRads = (item * unitRads);
+			var sizeAngle = (item * unitAngle);
 
             self.renderable.add(
             	new THREE.Mesh(
-            		self.providers.geometry(self, index, startRads, sizeRads),
+            		self.providers.geometry(self, index, item, startAngle, sizeAngle),
             		self.providers.material(self, index, item)
             	)
             );
 
-            startRads += sizeRads;
+            startAngle += sizeAngle;
 		});
 	}
 
@@ -70,21 +70,21 @@ Peanuts.Three.Charts.PieChart = function () {
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
-	function BasicCylinderGeometryProvider() {
+	function BasicCylinderProvider() {
 
 		var self = this;
 
-		return function(chart, index, startDeg, sizeDeg) {
+		return function(chart, index, item, startAngle, sizeAngle) {
 
             return new THREE.CylinderGeometry(
-                chart.config.radius,	
+                chart.config.radius,
                 chart.config.radius,
                 chart.config.height,
                 30,
                 1,
                 false,
-                THREE.Math.degToRad(startDeg),
-                THREE.Math.degToRad(sizeDeg)
+                THREE.Math.degToRad(startAngle),
+                THREE.Math.degToRad(sizeAngle)
             );
 		}
 	}
