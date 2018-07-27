@@ -1,0 +1,117 @@
+<html>
+<head>
+
+    <title>Peanuts</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/deps/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="/deps/highlightjs/styles/darkula.css">
+    <link rel="stylesheet" href="/assets/styles/styles.css">
+    
+    <script src="/assets/scripts/codePrinter.js"></script>
+
+    <script src="/deps/highlightjs/highlight.pack.min.js"></script>
+    <script src="/deps/dat.gui/build/dat.gui.min.js"></script>
+    <script src="/deps/stats-js/build/stats.min.js"></script>
+    <script src="/deps/signals/dist/signals.min.js"></script>
+
+    <script src="/deps/three/build/three.min.js"></script>
+    <script src="/deps/three/examples/js/controls/OrbitControls.js"></script>
+
+    <script src="/app/peanuts.js"></script>
+    <script src="/app/peanuts.three.driver.js"></script>
+    <script src="/app/peanuts.three.inputs.js"></script>
+    <script src="/app/peanuts.three.app.js"></script>
+    <script src="/app/peanuts.three.app.builder.js"></script>
+    <script src="/app/peanuts.three.app.factory.js"></script>
+    <script src="/app/peanuts.three.view.js"></script>
+    <script src="/app/peanuts.three.view.builder.js"></script>
+    <script src="/app/ui/peanuts.three.dat.gui.geometry.js"></script>
+
+    <style type="text/css">
+        .threeApp {
+            height: 300px;
+        }
+    </style>
+
+</head>
+
+<body class="page">
+
+<div class="container">
+
+    <h1>Basic Geometries</h1>
+
+    <h2>Text Geometry</h2>
+
+    <div id="app" class="threeApp"></div>
+
+    <script type="text/javascript">
+
+        var demoSettings = {
+            text: "Peanuts",
+            size: 0.5
+        };
+
+        (CodePrinter.printAndRun(function(initUI) {
+
+            var app = new Peanuts.Three.App.Factory(
+                document.getElementById("app")
+            ).createDemoGLPerspectiveApp();
+
+            function createScene(demoSettings) {
+ 
+                app.view.setScene(new THREE.Scene());
+
+                app.loader.font.load( '/assets/fonts/DemoFont.json', function ( font ) {
+
+                    var geometry = new THREE.TextGeometry( demoSettings.text , {
+                        font: font,
+                        size: 0.5,
+                        height: 0.1,
+                        curveSegments: 3
+                    });
+
+                    var material = new THREE.MeshBasicMaterial({
+                        color: 0x00EE00,
+                        wireframe: false
+                    });
+
+                    var mesh = new THREE.Mesh(geometry, material);
+
+                    var bbox = new THREE.Box3().setFromObject(mesh);
+
+                    mesh.translateX((bbox.getSize().x /2) *-1);
+
+                    app.view.scene.add(mesh);
+
+                } );
+
+            }
+
+            createScene(demoSettings);
+       
+            app.start();
+
+            initUI(app, createScene); //Ignore me, demo menu initalisation
+
+        }, function(app, createScene) {
+
+            var uiControllers = [];
+    
+            uiControllers.push(app.datGui.add(demoSettings, 'text'));
+
+            uiControllers.forEach(function(item) {
+                item.onChange( function(value) {
+                    createScene(demoSettings) 
+                });
+            });
+
+        }))();
+
+    </script>
+</div>
+
+</body>
+
+</html>
