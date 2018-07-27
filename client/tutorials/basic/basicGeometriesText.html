@@ -66,13 +66,13 @@
 
                     var geometry = new THREE.TextGeometry( demoSettings.text , {
                         font: font,
-                        size: 0.6,
+                        size: 1,
                         height: 0.1,
                         curveSegments: 5
                     });
 
                     var material = new THREE.MeshBasicMaterial({
-                        color: 0x00EE00,
+                        color: 0x000000,
                         wireframe: false
                     });
 
@@ -81,6 +81,7 @@
                     var bbox = new THREE.Box3().setFromObject(mesh);
 
                     mesh.translateX((bbox.getSize().x /2) *-1);
+                    mesh.translateY((bbox.getSize().y /2) *-1);
 
                     app.view.scene.add(mesh);
 

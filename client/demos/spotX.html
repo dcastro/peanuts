@@ -1,0 +1,319 @@
+<html>
+<head>
+
+    <title>Peanuts</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/deps/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="/deps/highlightjs/styles/darkula.css">
+    <link rel="stylesheet" href="/assets/styles/styles.css">
+    
+    <script src="/assets/scripts/codePrinter.js"></script>
+
+    <script src="/deps/highlightjs/highlight.pack.min.js"></script>
+    <script src="/deps/dat.gui/build/dat.gui.min.js"></script>
+    <script src="/deps/stats-js/build/stats.min.js"></script>
+    <script src="/deps/signals/dist/signals.min.js"></script>
+
+    <script src="/deps/three/build/three.min.js"></script>
+    <script src="/deps/three/examples/js/controls/OrbitControls.js"></script>
+    <script src="/deps/three/examples/js/effects/AsciiEffect.js"></script>
+
+    <script src="/app/peanuts.js"></script>
+    <script src="/app/peanuts.three.driver.js"></script>
+    <script src="/app/peanuts.three.inputs.js"></script>
+    <script src="/app/peanuts.three.app.js"></script>
+    <script src="/app/peanuts.three.app.builder.js"></script>
+    <script src="/app/peanuts.three.app.factory.js"></script>
+    <script src="/app/peanuts.three.view.js"></script>
+    <script src="/app/peanuts.three.view.builder.js"></script>
+    <script src="/app/ui/peanuts.three.dat.gui.geometry.js"></script>
+
+    <style type="text/css">
+        .threeApp {
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+
+</head>
+
+<body class="page">
+
+
+    <h1>Basic Geometries</h1>
+
+    <h2>Text Geometry</h2>
+
+    <div id="app" class="threeApp" width="1920" height="1080" style="height:1080px; width:1920px;"></div>
+
+    <script type="text/javascript">
+
+        var demoSettings = {
+            texOffX: 0.0375952582557155,
+            texOffY: 0.0375952582557155,
+            text: "SPOT",
+            shny: 3
+        };
+
+        var theFont;
+
+        var theDemoFont;
+
+        var xMesh;
+
+        var lightBranch;
+
+        var textBranch;
+
+        var shite = [];
+
+        var neo;
+
+        (CodePrinter.printAndRun(function(initUI) {
+
+            var app = new Peanuts.Three.App.Factory(
+                document.getElementById("app")
+            ).createDemoGLPerspectiveApp();
+
+            function createScene(demoSettings) {
+ 
+                app.view.setScene(new THREE.Scene());
+
+                app.renderer.setClearColor(0,0);
+
+                app.loader.font.load( '/assets/fonts/FontAwesome.json', function ( demoFont ) {
+                    theDemoFont = demoFont;
+                });
+
+                app.loader.font.load( '/assets/fonts/Arial.json', function ( font ) {
+
+                    theFont = font;
+
+                    var spotGeometry = new THREE.TextGeometry(demoSettings.text, {
+                        font: font,
+                        size: 1,
+                        height: 0.2,
+                        curveSegments: 5
+                    });
+
+                    spotGeometry.center();
+
+                    var spotMaterial = new THREE.MeshPhongMaterial({
+                        color: 0x111111,
+                        shininess: demoSettings.shny,
+                        specular: 'white',
+                        wireframe: false
+                    });
+
+                    var spotMesh = new THREE.Mesh(spotGeometry, spotMaterial);
+
+                    var bbox = new THREE.Box3().setFromObject(spotMesh);
+
+                    app.view.scene.add(spotMesh);
+
+                    var xGeometry = new THREE.TextGeometry("X", {
+                        font: font,
+                        size: 1,
+                        height: 0.2,
+                        curveSegments: 5
+                    });
+
+                    xGeometry.center();
+
+
+                    var xMaterial = new THREE.MeshPhongMaterial({
+                        color: 'green',
+                        shininess: demoSettings.shny,
+
+                        specular: 'white',
+                        wireframe: false
+                    });
+
+
+                    app.loader.texture.load(
+                       "textures/metal/mtl_wall01_c.png",
+                        function (texture) {
+                            texture.offset.x += demoSettings.texOffX;
+
+                             xMaterial.map = texture;
+                             xMaterial.needsUpdate = true;
+                            spotMaterial.map = texture;
+                            spotMaterial.needsUpdate = true;
+                        }
+                    );
+
+                    console.log(demoSettings.texOffX);
+
+                    app.loader.texture.load(
+                       "textures/metal/mtl_wall01_s.png",
+                        function (texture) {
+                            texture.offset.x += 0.1;
+                             xMaterial.specularMap = texture;
+                             xMaterial.needsUpdate = true;
+                            spotMaterial.specularMap = texture;
+                            spotMaterial.needsUpdate = true;
+                        }
+                    );
+
+
+                    app.loader.texture.load(
+                       "textures/metal/mtl_wall01_n.png",
+                        function (texture) {
+                             xMaterial.normalMap = texture;
+                             xMaterial.needsUpdate = true;
+                            spotMaterial.normalMap = texture;
+                            spotMaterial.needsUpdate = true;
+                        }
+                    );
+
+
+
+                    xMesh = new THREE.Mesh(xGeometry, xMaterial);
+
+                    var xBox = new THREE.Box3().setFromObject(xMesh);
+
+                    xMesh.translateX((bbox.getSize().x / 2) + (xBox.getSize().x/2));
+
+                    var directionalLight = app.view.scene.addIt(new THREE.PointLight(0xFFFFFF), 2, 1 );
+
+                    var directionalLight1 = app.view.scene.addIt(new THREE.PointLight(0xFF0000), 2, 1 );
+
+                    var directionalLight2 = app.view.scene.addIt(new THREE.PointLight(0x00FF00), 2, 1 );
+
+                    var directionalLight3 = app.view.scene.addIt(new THREE.PointLight(0x0000FF), 2, 1 );
+
+
+                    directionalLight.translateZ(3);
+                    directionalLight1.translateX(3);
+                    directionalLight2.translateY(3);
+                    directionalLight3.translateZ(-3);
+
+                    var ambientLight = app.view.scene.addIt(new THREE.AmbientLight(0xFFFFFF));
+
+                    app.view.scene.add(xMesh);
+
+                    textBranch = new THREE.Group();
+                    textBranch.add(spotMesh);
+                    textBranch.add(xMesh);
+
+                    lightBranch = new THREE.Group();
+                    lightBranch.add(directionalLight);
+                     lightBranch.add(directionalLight1);
+                      lightBranch.add(directionalLight2);
+                       lightBranch.add(directionalLight3);
+                    lightBranch.add(ambientLight);
+
+                    app.view.scene.add(lightBranch);
+                    app.view.scene.add(textBranch);
+
+                } );
+            }
+
+            createScene(demoSettings);
+       
+            app.start();
+
+            app.inputs.mouse.events.onMouseDown.add(function(mouseShite) {
+
+
+                var what = Math.floor(Math.random() * 26) + 65;
+
+                var spotGeometry = new THREE.TextGeometry( String.fromCharCode(what), {
+                    font: theDemoFont,
+                    size: 0.2,
+                    height: 0.2,
+                    curveSegments: 5
+                });
+
+                spotGeometry.center();
+
+                var spotMaterial = new THREE.MeshPhongMaterial({
+                    color: (Math.random()*0xFFFFFF<<0),
+                    shininess: Math.random() * 30,
+                    specular: 'white',
+                    wireframe: false
+                });
+
+                var spotMesh = new THREE.Mesh(spotGeometry, spotMaterial);
+
+                spotMesh.userData.active = false; 
+
+                shite.push(spotMesh);
+
+                neo = spotMesh;
+
+                neo.userData.speed = Math.random();
+
+                app.view.scene.add(spotMesh);
+
+            });
+
+             app.inputs.mouse.events.onMouseUp.add(function(mouseShite) {
+                 neo.userData.active = true;
+            });
+
+            app.onUpdate(function() {
+               if(textBranch) { textBranch.rotateY(0.005); }
+               if(lightBranch) { 
+                    //lightBranch.rotateY(0.010);
+                }
+
+                if(shite) {
+                    shite.forEach(function(item) {
+                        if(item.userData.active) {
+                            console.log(item.userData.speed);
+                            item.material.wireframe = false;
+                             item.material.opacity = 1 + Math.sin(new Date().getTime() * .00025);;
+                             item.material.transparent = true;
+                            item.translateZ(0.1 * item.userData.speed * -1);
+                        } else {
+                        
+                        item.material.wireframe = false;
+                                     item.material.opacity = 0.5;
+                             item.material.transparent = true;
+
+                        item.position.set(
+                            app.view.camera.position.x, 
+                            app.view.camera.position.y, 
+                            app.view.camera.position.z
+                        );
+
+                        item.rotation.set(
+                            app.view.camera.rotation.x, 
+                            app.view.camera.rotation.y, 
+                            app.view.camera.rotation.z
+                        );
+                       neo.translateZ(-1);
+
+
+                        }
+                    });
+                }
+            });
+
+            initUI(app, createScene); //Ignore me, demo menu initalisation
+
+        }, function(app, createScene) {
+
+            var uiControllers = [];
+    
+            uiControllers.push(app.datGui.add(demoSettings, 'text'));
+            uiControllers.push(app.datGui.add(demoSettings, 'shny', 1, 100));
+            // uiControllers.push(app.datGui.add(demoSettings, 'texOffX', 0, 1));
+            // uiControllers.push(app.datGui.add(demoSettings, 'texOff', 0, 1));
+            
+            uiControllers.forEach(function(item) {
+                item.onChange( function(value) {
+                    createScene(demoSettings) 
+                });
+            });
+
+        }))();
+
+    </script>
+
+
+</body>
+
+</html>
