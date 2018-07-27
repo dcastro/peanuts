@@ -49,27 +49,26 @@
     <script type="text/javascript">
 
         var demoSettings = {
-            text: "Peanuts",
-            size: 0.5
+            text: "Peanuts Are Tasty"
         };
 
         (CodePrinter.printAndRun(function(initUI) {
 
             var app = new Peanuts.Three.App.Factory(
                 document.getElementById("app")
-            ).createDemoGLPerspectiveApp();
+            ).createDemoGLOrthographicApp();
 
             function createScene(demoSettings) {
  
                 app.view.setScene(new THREE.Scene());
 
-                app.loader.font.load( '/assets/fonts/DemoFont.json', function ( font ) {
+                app.loader.font.load( '/assets/fonts/Arial.json', function ( font ) {
 
                     var geometry = new THREE.TextGeometry( demoSettings.text , {
                         font: font,
-                        size: 0.5,
+                        size: 0.6,
                         height: 0.1,
-                        curveSegments: 3
+                        curveSegments: 5
                     });
 
                     var material = new THREE.MeshBasicMaterial({
