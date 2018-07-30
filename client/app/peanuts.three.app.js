@@ -35,9 +35,10 @@ Peanuts.Three.App.App = function (Peanuts) {
         };
 
         self.loader = {
+            promising: new Peanuts.Three.Loader.Promising(),
             texture: new THREE.TextureLoader(),
             font: new THREE.FontLoader()
-        }
+        };
 
         self.loader.texture.setPath("/assets/");
 

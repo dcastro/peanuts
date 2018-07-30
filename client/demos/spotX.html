@@ -22,6 +22,7 @@
     <script src="/app/peanuts.js"></script>
     <script src="/app/peanuts.three.driver.js"></script>
     <script src="/app/peanuts.three.inputs.js"></script>
+    <script src="/app/peanuts.three.loaders.js"></script>
     <script src="/app/peanuts.three.app.js"></script>
     <script src="/app/peanuts.three.app.builder.js"></script>
     <script src="/app/peanuts.three.app.factory.js"></script>
@@ -40,11 +41,6 @@
 
 <body class="page">
 
-
-    <h1>Basic Geometries</h1>
-
-    <h2>Text Geometry</h2>
-
     <div id="app" class="threeApp" width="1920" height="1080" style="height:1080px; width:1920px;"></div>
 
     <script type="text/javascript">
@@ -56,9 +52,6 @@
             shny: 3
         };
 
-        var theFont;
-
-        var theDemoFont;
 
         var xMesh;
 
@@ -76,143 +69,105 @@
                 document.getElementById("app")
             ).createDemoGLPerspectiveApp();
 
-            function createScene(demoSettings) {
- 
-                app.view.setScene(new THREE.Scene());
 
-                app.renderer.setClearColor(0,0);
+            app.renderer.setClearColor(0,0);
 
-                app.loader.font.load( '/assets/fonts/FontAwesome.json', function ( demoFont ) {
-                    theDemoFont = demoFont;
-                });
+            var assets = {
+                fonts : {},
+                textures: {}
+            };
 
-                app.loader.font.load( '/assets/fonts/Arial.json', function ( font ) {
+            function loadAssets() {
 
-                    theFont = font;
+                function setAsset(key, subKey) {
+                    return function(asset) {
+                        assets[key][subKey] = asset;
+                    }
+                }
 
-                    var spotGeometry = new THREE.TextGeometry(demoSettings.text, {
-                        font: font,
+                return Promise.all([
+                    app.loader.promising.load(app.loader.font, '/assets/fonts/FontAwesome.json').then(setAsset('fonts','awesome')),
+                    app.loader.promising.load(app.loader.font, '/assets/fonts/Arial.json').then(setAsset('fonts','arial')),
+                    app.loader.promising.load(app.loader.texture, 'textures/metal/mtl_wall01_c.png').then(setAsset('textures','spotXtex')),
+                    app.loader.promising.load(app.loader.texture, 'textures/metal/mtl_wall01_n.png').then(setAsset('textures','spotXnormal')),
+                    app.loader.promising.load(app.loader.texture, 'textures/metal/mtl_wall01_s.png').then(setAsset('textures','spotXspecular')),
+                ]);
+            } 
+
+            function createSpotXText() {
+
+                 var spotMesh = new THREE.Mesh(
+                    new THREE.TextGeometry("SPOT", {
+                        font: assets.fonts.arial,
                         size: 1,
                         height: 0.2,
                         curveSegments: 5
-                    });
-
-                    spotGeometry.center();
-
-                    var spotMaterial = new THREE.MeshPhongMaterial({
-                        color: 0x111111,
+                    }), 
+                    new THREE.MeshPhongMaterial({
+                        color: 'black',
                         shininess: demoSettings.shny,
                         specular: 'white',
                         wireframe: false
-                    });
+                    })
+                );
 
-                    var spotMesh = new THREE.Mesh(spotGeometry, spotMaterial);
+                spotMesh.geometry.center();
 
-                    var bbox = new THREE.Box3().setFromObject(spotMesh);
-
-                    app.view.scene.add(spotMesh);
-
-                    var xGeometry = new THREE.TextGeometry("X", {
-                        font: font,
+                var xMesh = new THREE.Mesh(
+                    new THREE.TextGeometry("X", {
+                        font: assets.fonts.arial,
                         size: 1,
                         height: 0.2,
                         curveSegments: 5
-                    });
-
-                    xGeometry.center();
-
-
-                    var xMaterial = new THREE.MeshPhongMaterial({
+                    }), 
+                    new THREE.MeshPhongMaterial({
                         color: 'green',
                         shininess: demoSettings.shny,
-
+                        map: assets.textures.spotXtex,
+                        normalMap: assets.textures.spotXnormal,
+                        specularMap: assets.textures.spotXspecular,
                         specular: 'white',
                         wireframe: false
-                    });
+                    })
+                );
 
+                xMesh.geometry.center();
 
-                    app.loader.texture.load(
-                       "textures/metal/mtl_wall01_c.png",
-                        function (texture) {
-                            texture.offset.x += demoSettings.texOffX;
+                var spotMeshWidth = (new THREE.Box3().setFromObject(spotMesh)).getSize().x;
+                var xMeshWidth = (new THREE.Box3().setFromObject(xMesh)).getSize().x;
+    
+                spotMesh.translateX(((xMeshWidth/2)*-1));
+                xMesh.translateX((spotMeshWidth/2)+0.1);
 
-                             xMaterial.map = texture;
-                             xMaterial.needsUpdate = true;
-                            spotMaterial.map = texture;
-                            spotMaterial.needsUpdate = true;
-                        }
-                    );
+                var spotXGroup = new THREE.Group();
 
-                    console.log(demoSettings.texOffX);
-
-                    app.loader.texture.load(
-                       "textures/metal/mtl_wall01_s.png",
-                        function (texture) {
-                            texture.offset.x += 0.1;
-                             xMaterial.specularMap = texture;
-                             xMaterial.needsUpdate = true;
-                            spotMaterial.specularMap = texture;
-                            spotMaterial.needsUpdate = true;
-                        }
-                    );
-
-
-                    app.loader.texture.load(
-                       "textures/metal/mtl_wall01_n.png",
-                        function (texture) {
-                             xMaterial.normalMap = texture;
-                             xMaterial.needsUpdate = true;
-                            spotMaterial.normalMap = texture;
-                            spotMaterial.needsUpdate = true;
-                        }
-                    );
-
-
-
-                    xMesh = new THREE.Mesh(xGeometry, xMaterial);
-
-                    var xBox = new THREE.Box3().setFromObject(xMesh);
-
-                    xMesh.translateX((bbox.getSize().x / 2) + (xBox.getSize().x/2));
-
-                    var directionalLight = app.view.scene.addIt(new THREE.PointLight(0xFFFFFF), 2, 1 );
-
-                    var directionalLight1 = app.view.scene.addIt(new THREE.PointLight(0xFF0000), 2, 1 );
-
-                    var directionalLight2 = app.view.scene.addIt(new THREE.PointLight(0x00FF00), 2, 1 );
-
-                    var directionalLight3 = app.view.scene.addIt(new THREE.PointLight(0x0000FF), 2, 1 );
-
-
-                    directionalLight.translateZ(3);
-                    directionalLight1.translateX(3);
-                    directionalLight2.translateY(3);
-                    directionalLight3.translateZ(-3);
-
-                    var ambientLight = app.view.scene.addIt(new THREE.AmbientLight(0xFFFFFF));
-
-                    app.view.scene.add(xMesh);
-
-                    textBranch = new THREE.Group();
-                    textBranch.add(spotMesh);
-                    textBranch.add(xMesh);
-
-                    lightBranch = new THREE.Group();
-                    lightBranch.add(directionalLight);
-                     lightBranch.add(directionalLight1);
-                      lightBranch.add(directionalLight2);
-                       lightBranch.add(directionalLight3);
-                    lightBranch.add(ambientLight);
-
-                    app.view.scene.add(lightBranch);
-                    app.view.scene.add(textBranch);
-
-                } );
+                spotXGroup.add(spotMesh);
+                spotXGroup.add(xMesh);
+                
+                return spotXGroup;
             }
 
-            createScene(demoSettings);
-       
-            app.start();
+            function loadScene(demoSettings) {
+
+                app.view.setScene(new THREE.Scene());
+
+                app.view.scene.add(createSpotXText());
+
+                var directionalLight = app.view.scene.addIt(new THREE.PointLight(0xFFFFFF), 2, 1 );
+
+                directionalLight.translateZ(3);
+   
+                var ambientLight = app.view.scene.addIt(new THREE.AmbientLight(0xFFFFFF));
+
+                lightBranch = new THREE.Group();
+                lightBranch.add(directionalLight);
+                // lightBranch.add(directionalLight1);
+                 // lightBranch.add(directionalLight2);
+                 //  lightBranch.add(directionalLight3);
+                //lightBranch.add(ambientLight);
+
+                app.view.scene.add(lightBranch);
+            }
 
             app.inputs.mouse.events.onMouseDown.add(function(mouseShite) {
 
@@ -220,7 +175,7 @@
                 var what = Math.floor(Math.random() * 26) + 65;
 
                 var spotGeometry = new THREE.TextGeometry( String.fromCharCode(what), {
-                    font: theDemoFont,
+                    font: assets.fonts.awesome,
                     size: 0.2,
                     height: 0.2,
                     curveSegments: 5
@@ -292,9 +247,16 @@
                 }
             });
 
-            initUI(app, createScene); //Ignore me, demo menu initalisation
+            loadAssets().then(function() {
+                loadScene(demoSettings);
+                app.start();
+            });
+            
+   
 
-        }, function(app, createScene) {
+            initUI(app, loadScene); //Ignore me, demo menu initalisation
+
+        }, function(app, loadScene) {
 
             var uiControllers = [];
     
@@ -305,7 +267,7 @@
             
             uiControllers.forEach(function(item) {
                 item.onChange( function(value) {
-                    createScene(demoSettings) 
+                    loadScene(demoSettings) 
                 });
             });
 
