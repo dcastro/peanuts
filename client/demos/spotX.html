@@ -22,6 +22,7 @@
     <script src="/app/peanuts.js"></script>
     <script src="/app/peanuts.three.driver.js"></script>
     <script src="/app/peanuts.three.inputs.js"></script>
+    <script src="/app/peanuts.three.loaders.js"></script>
     <script src="/app/peanuts.three.app.js"></script>
     <script src="/app/peanuts.three.app.builder.js"></script>
     <script src="/app/peanuts.three.app.factory.js"></script>
@@ -40,35 +41,92 @@
 
 <body class="page">
 
-
-    <h1>Basic Geometries</h1>
-
-    <h2>Text Geometry</h2>
-
     <div id="app" class="threeApp" width="1920" height="1080" style="height:1080px; width:1920px;"></div>
 
     <script type="text/javascript">
 
+        var ImprovedNoise = function () {
+
+    var p = [151,160,137,91,90,15,131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,
+         23,190,6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,88,237,149,56,87,
+         174,20,125,136,171,168,68,175,74,165,71,134,139,48,27,166,77,146,158,231,83,111,229,122,60,211,
+         133,230,220,105,92,41,55,46,245,40,244,102,143,54,65,25,63,161,1,216,80,73,209,76,132,187,208,
+         89,18,169,200,196,135,130,116,188,159,86,164,100,109,198,173,186,3,64,52,217,226,250,124,123,5,
+         202,38,147,118,126,255,82,85,212,207,206,59,227,47,16,58,17,182,189,28,42,223,183,170,213,119,
+         248,152,2,44,154,163,70,221,153,101,155,167,43,172,9,129,22,39,253,19,98,108,110,79,113,224,232,
+         178,185,112,104,218,246,97,228,251,34,242,193,238,210,144,12,191,179,162,241,81,51,145,235,249,
+         14,239,107,49,192,214,31,181,199,106,157,184,84,204,176,115,121,50,45,127,4,150,254,138,236,205,
+         93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180];
+
+    for (var i=0; i < 256 ; i++) {
+
+        p[256+i] = p[i];
+
+    }
+
+    function fade(t) {
+
+        return t * t * t * (t * (t * 6 - 15) + 10);
+
+    }
+
+    function lerp(t, a, b) {
+
+        return a + t * (b - a);
+
+    }
+
+    function grad(hash, x, y, z) {
+
+        var h = hash & 15;
+        var u = h < 8 ? x : y, v = h < 4 ? y : h == 12 || h == 14 ? x : z;
+        return ((h&1) == 0 ? u : -u) + ((h&2) == 0 ? v : -v);
+
+    }
+
+    return {
+
+        noise: function (x, y, z) {
+
+            var floorX = Math.floor(x), floorY = Math.floor(y), floorZ = Math.floor(z);
+
+            var X = floorX & 255, Y = floorY & 255, Z = floorZ & 255;
+
+            x -= floorX;
+            y -= floorY;
+            z -= floorZ;
+
+            var xMinus1 = x -1, yMinus1 = y - 1, zMinus1 = z - 1;
+
+            var u = fade(x), v = fade(y), w = fade(z);
+
+            var A = p[X]+Y, AA = p[A]+Z, AB = p[A+1]+Z, B = p[X+1]+Y, BA = p[B]+Z, BB = p[B+1]+Z;
+
+            return lerp(w, lerp(v, lerp(u, grad(p[AA], x, y, z), 
+                            grad(p[BA], xMinus1, y, z)),
+                        lerp(u, grad(p[AB], x, yMinus1, z),
+                            grad(p[BB], xMinus1, yMinus1, z))),
+                    lerp(v, lerp(u, grad(p[AA+1], x, y, zMinus1),
+                            grad(p[BA+1], xMinus1, y, z-1)),
+                        lerp(u, grad(p[AB+1], x, yMinus1, zMinus1),
+                            grad(p[BB+1], xMinus1, yMinus1, zMinus1))));
+
+        }
+    }
+}
+
         var demoSettings = {
             texOffX: 0.0375952582557155,
             texOffY: 0.0375952582557155,
-            text: "SPOT",
-            shny: 3
+            floorWidth: 50,
+            floorDepth: 50,
+            floorHeight: 1.5,
+            floorRes: 64,
+            stepCount: 0,
+            noiseSeed: Math.random() * 10,
+            noiseScale: 6,
+            moveSpeed: 0.1
         };
-
-        var theFont;
-
-        var theDemoFont;
-
-        var xMesh;
-
-        var lightBranch;
-
-        var textBranch;
-
-        var shite = [];
-
-        var neo;
 
         (CodePrinter.printAndRun(function(initUI) {
 
@@ -76,236 +134,203 @@
                 document.getElementById("app")
             ).createDemoGLPerspectiveApp();
 
-            function createScene(demoSettings) {
- 
-                app.view.setScene(new THREE.Scene());
+            app.renderer.setClearColor(0,0);
 
-                app.renderer.setClearColor(0,0);
+            var assets = {
+                fonts : {},
+                textures: {},
+                geometries : {}
+            };
 
-                app.loader.font.load( '/assets/fonts/FontAwesome.json', function ( demoFont ) {
-                    theDemoFont = demoFont;
+            function loadAssets() {
+
+                function setAsset(key, subKey) {
+                    return function(asset) {
+                        assets[key][subKey] = asset;
+                    }
+                }
+
+                return Promise.all([
+                    app.loader.promising.load(app.loader.font, '/assets/fonts/FontAwesome.json').then(setAsset('fonts','awesome')),
+                    app.loader.promising.load(app.loader.font, '/assets/fonts/Arial.json').then(setAsset('fonts','arial')),
+                    app.loader.promising.load(app.loader.texture, 'textures/metal/mtl_wall01_c.png').then(setAsset('textures','spotXtex')),
+                    app.loader.promising.load(app.loader.texture, 'textures/metal/mtl_wall01_n.png').then(setAsset('textures','spotXnormal')),
+                    app.loader.promising.load(app.loader.texture, 'textures/metal/mtl_wall01_s.png').then(setAsset('textures','spotXspecular')),
+                ]);
+            } 
+
+            function createFloor() { 
+
+                var floorMaterial = new THREE.MeshPhongMaterial({
+                        color: 0xeeeeee, 
+                        side: THREE.DoubleSide, 
+                        blending: THREE.AdditiveBlending, 
+                        wireframe: true
                 });
+                
+                var floorGeometry = new THREE.PlaneGeometry(
+                        demoSettings.floorWidth, 
+                        demoSettings.floorDepth, 
+                        demoSettings.floorRes, 
+                        demoSettings.floorRes
+                );
 
-                app.loader.font.load( '/assets/fonts/Arial.json', function ( font ) {
+                var floorMesh = new THREE.Mesh(floorGeometry, floorMaterial);
+                    floorMesh.rotation.x = Math.PI / 1.65;
+                    floorMesh.rotation.x = Math.PI / 2;
 
-                    theFont = font;
+                var floorGroup = new THREE.Object3D();
 
-                    var spotGeometry = new THREE.TextGeometry(demoSettings.text, {
-                        font: font,
-                        size: 1,
-                        height: 0.2,
-                        curveSegments: 5
-                    });
+                floorGroup.add(floorMesh);
+                floorGroup.position.y = 0;
 
-                    spotGeometry.center();
+                assets.geometries.floor = floorGeometry;
 
-                    var spotMaterial = new THREE.MeshPhongMaterial({
-                        color: 0x111111,
-                        shininess: demoSettings.shny,
-                        specular: 'white',
-                        wireframe: false
-                    });
-
-                    var spotMesh = new THREE.Mesh(spotGeometry, spotMaterial);
-
-                    var bbox = new THREE.Box3().setFromObject(spotMesh);
-
-                    app.view.scene.add(spotMesh);
-
-                    var xGeometry = new THREE.TextGeometry("X", {
-                        font: font,
-                        size: 1,
-                        height: 0.2,
-                        curveSegments: 5
-                    });
-
-                    xGeometry.center();
-
-
-                    var xMaterial = new THREE.MeshPhongMaterial({
-                        color: 'green',
-                        shininess: demoSettings.shny,
-
-                        specular: 'white',
-                        wireframe: false
-                    });
-
-
-                    app.loader.texture.load(
-                       "textures/metal/mtl_wall01_c.png",
-                        function (texture) {
-                            texture.offset.x += demoSettings.texOffX;
-
-                             xMaterial.map = texture;
-                             xMaterial.needsUpdate = true;
-                            spotMaterial.map = texture;
-                            spotMaterial.needsUpdate = true;
-                        }
-                    );
-
-                    console.log(demoSettings.texOffX);
-
-                    app.loader.texture.load(
-                       "textures/metal/mtl_wall01_s.png",
-                        function (texture) {
-                            texture.offset.x += 0.1;
-                             xMaterial.specularMap = texture;
-                             xMaterial.needsUpdate = true;
-                            spotMaterial.specularMap = texture;
-                            spotMaterial.needsUpdate = true;
-                        }
-                    );
-
-
-                    app.loader.texture.load(
-                       "textures/metal/mtl_wall01_n.png",
-                        function (texture) {
-                             xMaterial.normalMap = texture;
-                             xMaterial.needsUpdate = true;
-                            spotMaterial.normalMap = texture;
-                            spotMaterial.needsUpdate = true;
-                        }
-                    );
-
-
-
-                    xMesh = new THREE.Mesh(xGeometry, xMaterial);
-
-                    var xBox = new THREE.Box3().setFromObject(xMesh);
-
-                    xMesh.translateX((bbox.getSize().x / 2) + (xBox.getSize().x/2));
-
-                    var directionalLight = app.view.scene.addIt(new THREE.PointLight(0xFFFFFF), 2, 1 );
-
-                    var directionalLight1 = app.view.scene.addIt(new THREE.PointLight(0xFF0000), 2, 1 );
-
-                    var directionalLight2 = app.view.scene.addIt(new THREE.PointLight(0x00FF00), 2, 1 );
-
-                    var directionalLight3 = app.view.scene.addIt(new THREE.PointLight(0x0000FF), 2, 1 );
-
-
-                    directionalLight.translateZ(3);
-                    directionalLight1.translateX(3);
-                    directionalLight2.translateY(3);
-                    directionalLight3.translateZ(-3);
-
-                    var ambientLight = app.view.scene.addIt(new THREE.AmbientLight(0xFFFFFF));
-
-                    app.view.scene.add(xMesh);
-
-                    textBranch = new THREE.Group();
-                    textBranch.add(spotMesh);
-                    textBranch.add(xMesh);
-
-                    lightBranch = new THREE.Group();
-                    lightBranch.add(directionalLight);
-                     lightBranch.add(directionalLight1);
-                      lightBranch.add(directionalLight2);
-                       lightBranch.add(directionalLight3);
-                    lightBranch.add(ambientLight);
-
-                    app.view.scene.add(lightBranch);
-                    app.view.scene.add(textBranch);
-
-                } );
+                return floorGroup;
             }
 
-            createScene(demoSettings);
-       
-            app.start();
+            function createSpotXText() {
 
-            app.inputs.mouse.events.onMouseDown.add(function(mouseShite) {
+                 var spotMesh = new THREE.Mesh(
+                    new THREE.TextGeometry("SPOT", {
+                        font: assets.fonts.arial,
+                        size: 1,
+                        height: 0.2,
+                        curveSegments: 5
+                    }), 
+                    new THREE.MeshPhongMaterial({
+                        color: 'black',
+                        shininess: demoSettings.shny,
+                        metalness: 1.0,
+                        specular: 'white',
+                        wireframe: false
+                    })
+                );
+
+                spotMesh.geometry.center();
+
+                var xMesh = new THREE.Mesh(
+                    new THREE.TextGeometry("X", {
+                        font: assets.fonts.arial,
+                        size: 1,
+                        height: 0.2,
+                        curveSegments: 5
+                    }), 
+                    new THREE.MeshPhongMaterial({
+                        color: 'green',
+                        shininess: demoSettings.shny,
+                        map: assets.textures.spotXtex,
+                        normalMap: assets.textures.spotXnormal,
+                        specularMap: assets.textures.spotXspecular,
+                        specular: 'white',
+                        wireframe: false
+                    })
+                );
+
+                xMesh.geometry.center();
+
+                var spotMeshWidth = (new THREE.Box3().setFromObject(spotMesh)).getSize().x;
+                var xMeshWidth = (new THREE.Box3().setFromObject(xMesh)).getSize().x;
+    
+                spotMesh.translateX(((xMeshWidth/2)*-1));
+                xMesh.translateX((spotMeshWidth/2)+0.1);
+
+                var spotXGroup = new THREE.Group();
+
+                spotXGroup.add(spotMesh);
+                spotXGroup.add(xMesh);
+                
+                spotXGroup.translateY(0.5);
+
+                return spotXGroup;
+            }
 
 
-                var what = Math.floor(Math.random() * 26) + 65;
+            function createLights() {
 
-                var spotGeometry = new THREE.TextGeometry( String.fromCharCode(what), {
-                    font: theDemoFont,
-                    size: 0.2,
-                    height: 0.2,
-                    curveSegments: 5
-                });
+                  var directionalLight = app.view.scene.addIt(new THREE.PointLight(0xFFFFFF), 2, 1 );
+                      directionalLight.translateZ(3);
+   
+                var ambientLight = app.view.scene.addIt(new THREE.AmbientLight(0xFFFFFF));
 
-                spotGeometry.center();
+                lightBranch = new THREE.Group();
+                lightBranch.add(directionalLight);
+            }
 
-                var spotMaterial = new THREE.MeshPhongMaterial({
-                    color: (Math.random()*0xFFFFFF<<0),
-                    shininess: Math.random() * 30,
-                    specular: 'white',
-                    wireframe: false
-                });
 
-                var spotMesh = new THREE.Mesh(spotGeometry, spotMaterial);
+            function animateFloor(floorGeometry) {
 
-                spotMesh.userData.active = false; 
+                var snoise = new ImprovedNoise();
 
-                shite.push(spotMesh);
+                var ds = demoSettings;
 
-                neo = spotMesh;
+                ds.stepCount++;
 
-                neo.userData.speed = Math.random();
+                var offset = ds.stepCount * ds.moveSpeed / ds.floorDepth * ds.floorRes;
 
-                app.view.scene.add(spotMesh);
+                for (var i = 0; i < ds.floorRes + 1; i++) {
+                    for (var j = 0; j <  ds.floorRes + 1; j++) {
 
-            });
+                        var ipos = i + offset;
 
-             app.inputs.mouse.events.onMouseUp.add(function(mouseShite) {
-                 neo.userData.active = true;
-            });
+                        floorGeometry.vertices[i * (ds.floorRes + 1) + j].z = snoise.noise(
+                            ipos / ds.floorRes * ds.noiseScale, 
+                            j / ds.floorRes * ds.noiseScale, 
+                            ds.noiseSeed
+                        );
+
+                        if ((i > 30) || (j < 12) || (j > 48)) {
+                          floorGeometry.vertices[i * (ds.floorRes + 1) + j].z *= ds.floorHeight;
+                        } else if (i > 25 && i < 30) {
+                          floorGeometry.vertices[i * (ds.floorRes + 1) + j].z *= (ds.floorHeight / 1.2);
+                        } else {
+                          floorGeometry.vertices[i * (ds.floorRes + 1) + j].z *= (ds.floorHeight / 2);
+                        }
+                    }
+                }
+
+                floorGeometry.verticesNeedUpdate = true;
+            }
+
+            function loadScene(ds) {
+
+                app.view.setScene(new THREE.Scene());
+
+                app.view.scene.add(createLights());
+                app.view.scene.add(createFloor());
+                app.view.scene.add(createSpotXText());
+            }
+
+            app.inputs.mouse.events.onMouseDown.add(function(mouseState) {});
+
+            app.inputs.mouse.events.onMouseUp.add(function(mouseState) {});
 
             app.onUpdate(function() {
-               if(textBranch) { textBranch.rotateY(0.005); }
-               if(lightBranch) { 
-                    //lightBranch.rotateY(0.010);
-                }
-
-                if(shite) {
-                    shite.forEach(function(item) {
-                        if(item.userData.active) {
-                            console.log(item.userData.speed);
-                            item.material.wireframe = false;
-                             item.material.opacity = 1 + Math.sin(new Date().getTime() * .00025);;
-                             item.material.transparent = true;
-                            item.translateZ(0.1 * item.userData.speed * -1);
-                        } else {
-                        
-                        item.material.wireframe = false;
-                                     item.material.opacity = 0.5;
-                             item.material.transparent = true;
-
-                        item.position.set(
-                            app.view.camera.position.x, 
-                            app.view.camera.position.y, 
-                            app.view.camera.position.z
-                        );
-
-                        item.rotation.set(
-                            app.view.camera.rotation.x, 
-                            app.view.camera.rotation.y, 
-                            app.view.camera.rotation.z
-                        );
-                       neo.translateZ(-1);
-
-
-                        }
-                    });
-                }
+                animateFloor(assets.geometries.floor);
             });
 
-            initUI(app, createScene); //Ignore me, demo menu initalisation
+            loadAssets().then(function() {
+                loadScene(demoSettings);
+                app.start();
+            });
+        
 
-        }, function(app, createScene) {
+            initUI(app, loadScene); //Ignore me, demo menu initalisation
+
+        }, function(app, loadScene) {
 
             var uiControllers = [];
     
-            uiControllers.push(app.datGui.add(demoSettings, 'text'));
-            uiControllers.push(app.datGui.add(demoSettings, 'shny', 1, 100));
+    
+            uiControllers.push(app.datGui.add(demoSettings, 'noiseSeed', 0, 10));
+            uiControllers.push(app.datGui.add(demoSettings, 'noiseScale', 0, 10));
+            uiControllers.push(app.datGui.add(demoSettings, 'moveSpeed', 0, 1));
             // uiControllers.push(app.datGui.add(demoSettings, 'texOffX', 0, 1));
             // uiControllers.push(app.datGui.add(demoSettings, 'texOff', 0, 1));
             
             uiControllers.forEach(function(item) {
                 item.onChange( function(value) {
-                    createScene(demoSettings) 
+                    loadScene(demoSettings) 
                 });
             });
 
