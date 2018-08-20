@@ -43,9 +43,18 @@ Peanuts.Three.App.Builder = function (Peanuts) {
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
-    AppBuilder.prototype.withPerspectiveView = function () {
+    AppBuilder.prototype.withBasicAssetManager = function () {
 
-        console.log(Peanuts.Three);
+        this.app.assets = new Peanuts.Three.Assets.BasicManager('/assets/');
+
+        return this;
+    };
+
+
+    //////////////////////////////////////////////////////////
+    //
+    //////////////////////////////////////////////////////////
+    AppBuilder.prototype.withPerspectiveView = function () {
 
         var viewBuilder = new Peanuts.Three.View.Builder(this.app);
 

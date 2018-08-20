@@ -34,13 +34,12 @@ Peanuts.Three.App.App = function (Peanuts) {
             onReSized: new signals.Signal()
         };
 
-        self.loader = {
-            promising: new Peanuts.Three.Loader.Promising(),
-            texture: new THREE.TextureLoader(),
-            font: new THREE.FontLoader()
+        self.loaders = {
+            texture: new Peanuts.Three.Loader.Promising(new THREE.TextureLoader()),
+            font: new Peanuts.Three.Loader.Promising(new THREE.FontLoader())
         };
 
-        self.loader.texture.setPath("/assets/");
+        self.loaders.texture.setPath("/assets/");
 
         window.addEventListener('resize', function () { 
             onAppReSized(self); 

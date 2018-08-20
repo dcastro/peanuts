@@ -18,6 +18,7 @@ Peanuts.Three.App.Factory = function (Peanuts) {
         var app = this.appBuilder
             .withGLRenderer()
             .withPerspectiveView()
+            .withBasicAssetManager()
             .withDatGui()
             .withStats()
             .build();
@@ -33,6 +34,7 @@ Peanuts.Three.App.Factory = function (Peanuts) {
         var app = this.appBuilder
             .withGLRenderer()
             .withOrthograpicView()
+            .withBasicAssetManager()
             .withDatGui()
             .build();
 
