@@ -64,7 +64,8 @@
  
                 app.view.setScene(new THREE.Scene());
 
-                app.loader.font.load( '/assets/fonts/Arial.json', function ( font ) {
+                app.loader.font.load( '/assets/fonts/Arial.json').then(
+                    function ( font ) {
 
                     var geometry = new THREE.TextGeometry( demoSettings.text , {
                         font: font,
@@ -74,7 +75,7 @@
                     });
 
                     var material = new THREE.MeshBasicMaterial({
-                        color: 0x000000,
+                        color: 0xFFFFFF,
                         wireframe: false
                     });
 
