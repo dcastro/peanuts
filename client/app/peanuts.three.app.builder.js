@@ -43,9 +43,13 @@ Peanuts.Three.App.Builder = function (Peanuts) {
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
-    AppBuilder.prototype.withBasicAssetManager = function () {
+    AppBuilder.prototype.withBasicAssetManager = function (path) {
 
-        this.app.assets = new Peanuts.Three.Assets.BasicManager('/assets/');
+        path = path | "/assets/";
+
+        this.app.assets = new Peanuts.Three.Assets.BasicManager(
+            '/assets/'
+        );
 
         return this;
     };

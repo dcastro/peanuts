@@ -22,7 +22,6 @@ Peanuts.Three.Charts.CandleChart = function () {
 			geometry : new BasicCandleProvider()
 		}, providers );
 
-
 		this.update(data);
 	}
 

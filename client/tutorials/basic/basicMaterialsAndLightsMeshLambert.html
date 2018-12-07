@@ -21,6 +21,8 @@
     <script src="/app/peanuts.js"></script>
     <script src="/app/peanuts.three.driver.js"></script>
     <script src="/app/peanuts.three.inputs.js"></script>
+    <script src="/app/peanuts.three.loaders.js"></script>
+    <script src="/app/peanuts.three.assets.js"></script>
     <script src="/app/peanuts.three.app.js"></script>
     <script src="/app/peanuts.three.app.builder.js"></script>
     <script src="/app/peanuts.three.app.factory.js"></script>
@@ -79,6 +81,14 @@
                 var lightDirectionalHelper = new THREE.DirectionalLightHelper(lightDirectional, 2);
 
 
+                var setTexture = function(material, toSet) {
+                    return function(texture) {
+                        material[toSet] = texture;
+                        material.needsUpdate = true;
+                        texture.minFilter = THREE.LinearFilter;
+                    };
+                };
+
                 var material = new THREE.MeshLambertMaterial({
                     color: new THREE.Color(materialSettings.color),
                     wireframe: materialSettings.wireframe,
@@ -86,20 +96,13 @@
                 });
 
                 app.loader.texture.load(
-                    materialSettings.map,
-                    function (texture) {
-                        material.map = texture;
-                        material.needsUpdate = true;
-                    }
-                );
+                    materialSettings.map
+                ).then(setTexture(material, "map"));
 
                 app.loader.texture.load(
-                    materialSettings.specularMap,
-                    function (texture) {
-                        material.specularMap = texture;
-                        material.needsUpdate = true;
-                    }
-                );
+                    materialSettings.specularMap
+                ).then(setTexture(material, "specularMap"));
+
 
                 var geometry = new THREE.BoxGeometry(2, 2, 2);
                     geometry.computeVertexNormals();
