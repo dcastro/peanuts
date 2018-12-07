@@ -23,6 +23,7 @@
     <script src="/app/peanuts.three.driver.js"></script>
     <script src="/app/peanuts.three.inputs.js"></script>
     <script src="/app/peanuts.three.loaders.js"></script>
+    <script src="/app/peanuts.three.assets.js"></script>
     <script src="/app/peanuts.three.app.js"></script>
     <script src="/app/peanuts.three.app.builder.js"></script>
     <script src="/app/peanuts.three.app.factory.js"></script>
@@ -73,7 +74,8 @@
 
                 Promise.all([
 
-                    app.assets.loadTexture('textures/balls/shinyEnvMap.png', 'envMap')
+                    app.assets.loadTexture('textures/balls/shinyEnvMap.png', 'envMap'),
+                    app.assets.loadTexture('textures/balls/roughnessEnvMap.png', 'roughMap')
 
                 ]).then(function() {
 
@@ -105,7 +107,7 @@
                         6.3
                     ), 
                     new THREE.MeshStandardMaterial({
-                        color: 'red',
+                        color: 'white',
                         roughness: 0, 
                         envMap: assets.getTexture('envMap')
                     })
@@ -117,8 +119,6 @@
 
                 this.object3D = new THREE.Group();
                 this.object3D.add(this.mesh);
-
-                console.log('here', this);
 
                 return this;
             }

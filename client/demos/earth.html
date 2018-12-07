@@ -73,9 +73,9 @@
                                 opacity: 1,
                                 wireframe : false,
                                 color :  new THREE.Color(0xFFFFFF),
-                                map: "textures/earth/earthmap1k.jpg",
-                                bumpMap: "textures/earth/earthbump1k.jpg",
-                                specularMap: "textures/earth/earthspec1k.jpg",
+                                map: "/textures/earth/earthmap1k.jpg",
+                                bumpMap: "/textures/earth/earthbump1k.jpg",
+                                specularMap: "/textures/earth/earthspec1k.jpg",
                             }
                         }
                     };
@@ -116,19 +116,16 @@
                         };
 
                         app.loader.texture.load(
-                            demoSettings.globe.material.map, 
-                            setTexture(sphereMaterial, "map")
-                        );
+                            demoSettings.globe.material.map
+                        ).then(setTexture(sphereMaterial, "map"));
 
                         app.loader.texture.load(
                             demoSettings.globe.material.bumpMap, 
-                            setTexture(sphereMaterial, "bumpMap")
-                        );
+                        ).then(setTexture(sphereMaterial, "bumpMap"));
 
                         app.loader.texture.load(
                             demoSettings.globe.material.specularMap, 
-                            setTexture(sphereMaterial, "specularMap")
-                        );
+                        ).then(setTexture(sphereMaterial, "specularMap"));
 
                         app.view.camera.position.set(0,0, demoSettings.globe.geometry.radius * -5);
 
