@@ -19,17 +19,19 @@ var GeoDataHelper = function () {
      * Enhance data by lat and lng attributes.
      * @param {*} data
      */
-    GeoData.prototype.addLatLng = async function (data) {
-        const geo = await init();
+    GeoData.prototype.addLatLng = function (data) {
+        if (!dataCache) {
+            throw new Error('geo data not available yet');
+        }
         for (var i = 0; i < data.length; i++) {
-            if (!geo[data[i].targets_geo_city]) {
+            if (!dataCache[data[i].targets_geo_city]) {
                 console.log('No location data for ' + JSON.stringify(data[i]))
                 continue;
             }
-            data[i].lat = geo[data[i].targets_geo_city].latitude;
-            data[i].lng = geo[data[i].targets_geo_city].longitude;
+            data[i].lat = dataCache[data[i].targets_geo_city].latitude;
+            data[i].lng = dataCache[data[i].targets_geo_city].longitude;
         }
-        return Promise.resolve();
+        return data;
     }
 
     /**
