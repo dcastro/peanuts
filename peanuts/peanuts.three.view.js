@@ -68,6 +68,17 @@ Peanuts.Three.View.View = function (Peanuts) {
         return this;
     };
 
+
+    //////////////////////////////////////////////////////////
+    //
+    //////////////////////////////////////////////////////////
+    View.prototype.setComposer = function (composer) {
+
+        this.composer = composer;
+
+        return this;
+    };
+
     //////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////
@@ -100,11 +111,16 @@ Peanuts.Three.View.View = function (Peanuts) {
     View.prototype.render = function () {
 
         if (this.app && this.scene && this.camera) {
-            this.app.renderer.render(this.scene, this.camera);
+            if(this.composer) {
+               this.composer.render();
+            } else {
+                this.app.renderer.render(this.scene, this.camera);
+            }
         }
 
         return this;
     };
+
 
     return View;
 

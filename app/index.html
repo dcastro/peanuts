@@ -10,6 +10,12 @@
     
     <script src="/assets/scripts/codePrinter.js"></script>
 
+    <script src="/deps/papaparse/papaparse.js"></script>
+    <script src="/deps/lodash/lodash.js"></script>
+    <script src="/geo.js"></script>
+    <script src="/ironbarkService.js"></script>
+
+
     <script src="/deps/highlightjs/highlight.pack.min.js"></script>
     <script src="/deps/dat.gui/build/dat.gui.min.js"></script>
     <script src="/deps/stats-js/build/stats.min.js"></script>
@@ -18,9 +24,34 @@
     <script src="/deps/three/build/three.min.js"></script>
     <script src="/deps/three/examples/js/controls/OrbitControls.js"></script>
 
-    <script src="/deps/papaparse/papaparse.js"></script>
-    <script src="/deps/lodash/lodash.js"></script>
-    <script src="/geo.js"></script>
+
+    <script src="/deps/three/examples/js/shaders/BleachBypassShader.js"></script>
+    <script src="/deps/three/examples/js/shaders/ColorifyShader.js"></script>
+    <script src="/deps/three/examples/js/shaders/ConvolutionShader.js"></script>
+    <script src="/deps/three/examples/js/shaders/CopyShader.js"></script>
+    <script src="/deps/three/examples/js/shaders/DotScreenShader.js"></script>
+    <script src="/deps/three/examples/js/shaders/RGBShiftShader.js"></script>
+    <script src="/deps/three/examples/js/shaders/SobelOperatorShader.js"></script>
+    
+    <script src="/deps/three/examples/js/shaders/FilmShader.js"></script>
+    <script src="/deps/three/examples/js/shaders/HorizontalBlurShader.js"></script>
+    <script src="/deps/three/examples/js/shaders/SepiaShader.js"></script>
+    <script src="/deps/three/examples/js/shaders/VerticalBlurShader.js"></script>
+    <script src="/deps/three/examples/js/shaders/VignetteShader.js"></script>
+    <script src="/deps/three/examples/js/shaders/DigitalGlitch.js"></script>
+
+    <script src="/deps/three/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="/deps/three/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="/deps/three/examples/js/postprocessing/BloomPass.js"></script>
+    <script src="/deps/three/examples/js/postprocessing/GlitchPass.js"></script>
+    
+    <script src="/deps/three/examples/js/postprocessing/FilmPass.js"></script>
+    <script src="/deps/three/examples/js/postprocessing/DotScreenPass.js"></script>
+    <script src="/deps/three/examples/js/postprocessing/TexturePass.js"></script>
+    <script src="/deps/three/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="/deps/three/examples/js/postprocessing/MaskPass.js"></script>
+
+
 
     <script src="/peanuts/peanuts.js"></script>
     <script src="/peanuts/peanuts.three.driver.js"></script>
@@ -61,47 +92,61 @@
 
             <script type="text/javascript">
 
+                    var setTexture = function(material, toSet) {
+                        return function(texture) {
+                            material[toSet] = texture;
+                            material.needsUpdate = true;
+                            texture.minFilter = THREE.LinearFilter;
+                        };
+                    };
+
+
                     var app = new Peanuts.Three.App.Factory(
                         document.getElementById("app")
                     ).createDemoGLPerspectiveApp();
 
                     var demoSettings =  {
+                        data: {
+                            hour: 0,
+                            glitch: 0
+                        },
                         light : {
-                            position: new THREE.Vector3(-55,50,-60),
                             color :  new THREE.Color(0xFFFFFF),
-                            intensity : 1.5
+                            position: new THREE.Vector3(-55,50,-60),
+                            intensity : 0.8
                         }, 
-                        globe : {
+                        overlay : {
                             geometry: {
-                                radius : 50,
-                                widthSegments : 128,
-                                heightSegments : 128
+                                radius : 1010,
+                                widthSegments :64,
+                                heightSegments : 64
                             },
                             material: {
                                 opacity: 1,
                                 wireframe : false,
+                                shininess: 70,
+                                color :  new THREE.Color(0x00FF00),
+                                alphaMap:  "/textures/earth/earth-dark-alpha.png"
+                            }
+                        },
+                        globe : {
+                            geometry: {
+                                radius : 1000,
+                                widthSegments :256,
+                                heightSegments : 256
+                            },
+                            material: {
+                                opacity: 1,
+                                wireframe : false,
+                                shininess: 70,
                                 color :  new THREE.Color(0xFFFFFF),
-                                // map: "/textures/earth/earthmap1k.jpg",
-                                // bumpMap: "/textures/earth/earth-dark-bump.jpg"
                                 map: "/textures/earth/earth-dark-map.jpg",
-                                bumpMap: "/textures/earth/earth-dark-bump.jpg",
-                                specularMap: "/textures/earth/earthspec1k.jpg"
+                                bumpMap: "/textures/earth/earth-dark-bump.jpg"
                             }
                         }
                     };
 
-                    function createScene(demoSettings) {
-
-                        var ambientLight = new THREE.AmbientLight(0x444444);
-
-                        var lightDirectional = new THREE.DirectionalLight(
-                            demoSettings.light.color,
-                            demoSettings.light.intensity
-                        );
-                        
-                        //lightDirectional.position.copy(demoSettings.light.position);
-
-                        var lightDirectionalHelper = new THREE.DirectionalLightHelper(lightDirectional, 2);
+                    function createGlobe(demoSettings) {
 
                         var sphereGeometry = new THREE.SphereGeometry(
                             demoSettings.globe.geometry.radius,
@@ -117,28 +162,91 @@
 
                         var sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
 
-                        var setTexture = function(material, toSet) {
-                            return function(texture) {
-                                material[toSet] = texture;
-                                material.needsUpdate = true;
-                                texture.minFilter = THREE.LinearFilter;
-                            };
-                        };
+                        app.loader.texture.load(demoSettings.globe.material.map).then(setTexture(sphereMaterial, "map"));
+                        app.loader.texture.load(demoSettings.globe.material.bumpMap).then(setTexture(sphereMaterial, "bumpMap"));
+                        app.loader.texture.load(demoSettings.globe.material.specularMap).then(setTexture(sphereMaterial, "specularMap"));
+                       
 
-                        app.loader.texture.load(
-                            demoSettings.globe.material.map
-                        ).then(setTexture(sphereMaterial, "map"));
+                        return sphereMesh;
+                    }
 
-                        app.loader.texture.load(
-                            demoSettings.globe.material.bumpMap, 
-                        ).then(setTexture(sphereMaterial, "bumpMap"));
+                    function createGlobeOverlay(demoSettings) {
 
-                        app.loader.texture.load(
-                            demoSettings.globe.material.specularMap, 
-                        ).then(setTexture(sphereMaterial, "specularMap"));
+                        var sphereGeometry = new THREE.SphereGeometry(
+                            demoSettings.overlay.geometry.radius,
+                            demoSettings.overlay.geometry.widthSegments,
+                            demoSettings.overlay.geometry.heightSegments
+                        );
 
-                        app.view.camera.position.set(0,0, demoSettings.globe.geometry.radius * -5);
+                        var sphereMaterial = new THREE.MeshBasicMaterial({
+                            color: new THREE.Color(demoSettings.overlay.material.color),
+                            wireframe: demoSettings.overlay.material.wireframe,
+                            opacity: demoSettings.overlay.material.opacity
+                        });
+
+                        var sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
+
+                        //app.loader.texture.load(demoSettings.overlay.material.alphaMap).then(setTexture(sphereMaterial, "map"));
+                        app.loader.texture.load(demoSettings.overlay.material.alphaMap).then(setTexture(sphereMaterial, "alphaMap"));
+
+                        return sphereMesh;
+                    }
+
+
+                    function createPostProcessing(demoSettings) {
+
+                        // postprocessing
+                        var composer = new THREE.EffectComposer(app.renderer);
+                         
+                        var dotscreen = new THREE.ShaderPass(THREE.DotScreenShader);
+                            dotscreen.uniforms['scale'].value = 40;
+                            dotscreen.renderToScreen = true;
+
+                        var effectFilmBW = new THREE.FilmPass( 0.95, 2, 2048);
+                          //  effectFilmBW.renderToScreen = true;
+
+                        var rgbshift = new THREE.ShaderPass(THREE.RGBShiftShader);
+                            rgbshift.uniforms['amount'].value = 0.0015;
+                            //rgbshift.renderToScreen = true;
+
+                        var glitch = new THREE.GlitchPass(demoSettings.data.glitch);
+                            glitch.renderToScreen = true;
+
+                        // var sobel_pass = new THREE.ShaderPass(THREE.SobelOperatorShader);
+                        //     sobel_pass.uniforms.resolution.value = new THREE.Vector2(1900, 1200); //or whatever resolution your screen is
+                        //     sobel_pass.renderToScreen = true;
+                        
+                         composer.addPass(new THREE.RenderPass(app.view.scene, app.view.camera));
+                         //composer.addPass(effectFilmBW);
+                         //composer.addPass(rgbshift);
+                         composer.addPass(glitch);
+                        // composer.addPass(sobel_pass);
+ 
+                         app.view.setComposer(composer);
+                    }
+
+                    function createControls(demoSettings) {
+                        console.log(demoSettings.data);
+                        app.datGui.add(demoSettings.data, "hour", 0, 24);
+                        app.datGui.add(demoSettings.data, "glitch", 0,1000);
+                    }
+
+                    function createScene(demoSettings) {
+
+                        var ambientLight = new THREE.AmbientLight(0x444444);
+
+                        var lightDirectional = new THREE.DirectionalLight(
+                            demoSettings.light.color,
+                            demoSettings.light.intensity
+                        );
+                        
+                        var lightDirectionalHelper = new THREE.DirectionalLightHelper(lightDirectional, 2);
+
+                        app.view.camera.position.set(0,0, -2400);
                         app.view.controls.update();
+
+                        var globe = createGlobe(demoSettings);
+                        var globeOverlay = createGlobeOverlay(demoSettings);
 
                         app.view.setScene(new THREE.Scene());
 
@@ -146,13 +254,20 @@
                         app.view.scene.add(app.view.camera);
                         app.view.scene.add(ambientLight);
                         app.view.scene.add(lightDirectional);
-                        app.view.scene.add(sphereMesh);
+                        app.view.scene.add(globe);
+                        //app.view.scene.add(globeOverlay);
 
+                        createPostProcessing(demoSettings);
+                        createControls(demoSettings);
+              
+    
                         return {
                             camera : app.view.camera,
                             light : lightDirectional
                         };
                     }
+
+
 
                     var demoObjects = createScene(demoSettings);
 
