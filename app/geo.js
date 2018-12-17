@@ -64,6 +64,5 @@ var GeoDataHelper = function () {
 
     }
 
-    init();
     return new GeoData();
 };
