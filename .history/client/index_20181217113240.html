@@ -1,0 +1,169 @@
+<html>
+<head>
+
+    <title>Peanuts</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/deps/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="/deps/highlightjs/styles/darkula.css">
+    <link rel="stylesheet" href="/assets/styles/styles.css">
+    
+    <script src="/assets/scripts/codePrinter.js"></script>
+
+    <script src="/deps/highlightjs/highlight.pack.min.js"></script>
+    <script src="/deps/dat.gui/build/dat.gui.min.js"></script>
+    <script src="/deps/stats-js/build/stats.min.js"></script>
+    <script src="/deps/signals/dist/signals.min.js"></script>
+
+    <script src="/deps/three/build/three.min.js"></script>
+    <script src="/deps/three/examples/js/controls/OrbitControls.js"></script>
+
+    <script src="/lib/peanuts/peanuts.js"></script>
+    <script src="/lib/peanuts/peanuts.three.driver.js"></script>
+    <script src="/lib/peanuts/peanuts.three.inputs.js"></script>
+    <script src="/lib/peanuts/peanuts.three.loaders.js"></script>
+    <script src="/lib/peanuts/peanuts.three.assets.js"></script>
+    <script src="/lib/peanuts/peanuts.three.app.js"></script>
+    <script src="/lib/peanuts/peanuts.three.app.builder.js"></script>
+    <script src="/lib/peanuts/peanuts.three.app.factory.js"></script>
+    <script src="/lib/peanuts/peanuts.three.view.js"></script>
+    <script src="/lib/peanuts/peanuts.three.view.builder.js"></script>
+    <script src="/lib/peanuts/ui/peanuts.three.dat.gui.js"></script>
+    <script src="/lib/peanuts/ui/peanuts.three.dat.gui.geometry.js"></script>
+
+    <style type="text/css">
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        .threeApp {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+
+</head>
+
+    <body>
+
+
+            <div id="app" class="threeApp"></div>
+
+            <script type="text/javascript">
+
+     
+                    var app = new Peanuts.Three.App.Factory(
+                        document.getElementById("app")
+                    ).createDemoGLPerspectiveApp();
+
+                    var demoSettings =  {
+                        light : {
+                            position: new THREE.Vector3(-55,50,-60),
+                            color :  new THREE.Color(0xFFFFFF),
+                            intensity : 1.5
+                        }, 
+                        globe : {
+                            geometry: {
+                                radius : 50,
+                                widthSegments : 128,
+                                heightSegments : 128
+                            },
+                            material: {
+                                opacity: 1,
+                                wireframe : false,
+                                color :  new THREE.Color(0xFFFFFF),
+                                // map: "/textures/earth/earthmap1k.jpg",
+                                // bumpMap: "/textures/earth/earth-dark-bump.jpg"
+                                map: "/textures/earth/earth-dark-map.jpg",
+                                bumpMap: "/textures/earth/earth-dark-bump.jpg",
+                                specularMap: "/textures/earth/earthspec1k.jpg"
+                            }
+                        }
+                    };
+
+                    function createScene(demoSettings) {
+
+                        var ambientLight = new THREE.AmbientLight(0x444444);
+
+                        var lightDirectional = new THREE.DirectionalLight(
+                            demoSettings.light.color,
+                            demoSettings.light.intensity
+                        );
+                        
+                        //lightDirectional.position.copy(demoSettings.light.position);
+
+                        var lightDirectionalHelper = new THREE.DirectionalLightHelper(lightDirectional, 2);
+
+                        var sphereGeometry = new THREE.SphereGeometry(
+                            demoSettings.globe.geometry.radius,
+                            demoSettings.globe.geometry.widthSegments,
+                            demoSettings.globe.geometry.heightSegments
+                        );
+
+                        var sphereMaterial = new THREE.MeshPhongMaterial({
+                            color: new THREE.Color(demoSettings.globe.material.color),
+                            wireframe: demoSettings.globe.material.wireframe,
+                            opacity: demoSettings.globe.material.opacity
+                        });
+
+                        var sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
+
+                        var setTexture = function(material, toSet) {
+                            return function(texture) {
+                                material[toSet] = texture;
+                                material.needsUpdate = true;
+                                texture.minFilter = THREE.LinearFilter;
+                            };
+                        };
+
+                        app.loader.texture.load(
+                            demoSettings.globe.material.map
+                        ).then(setTexture(sphereMaterial, "map"));
+
+                        app.loader.texture.load(
+                            demoSettings.globe.material.bumpMap, 
+                        ).then(setTexture(sphereMaterial, "bumpMap"));
+
+                        app.loader.texture.load(
+                            demoSettings.globe.material.specularMap, 
+                        ).then(setTexture(sphereMaterial, "specularMap"));
+
+                        app.view.camera.position.set(0,0, demoSettings.globe.geometry.radius * -5);
+                        app.view.controls.update();
+
+                        app.view.setScene(new THREE.Scene());
+
+                        app.view.scene.background = new THREE.Color(0,0x000000);
+                        app.view.scene.add(app.view.camera);
+                        app.view.scene.add(ambientLight);
+                        app.view.scene.add(lightDirectional);
+                        app.view.scene.add(sphereMesh);
+
+                        return {
+                            camera : app.view.camera,
+                            light : lightDirectional
+                        };
+                    }
+
+                    var demoObjects = createScene(demoSettings);
+
+                    app.view.onUpdate( function() {
+
+                        //demoObjects.light.position.set(new THREE.Vector3(-55,50,-60));
+                        demoObjects.light.position.copy( demoObjects.camera.position );
+
+                        console.log('update called', demoObjects.light.position);
+                    });
+
+                    app.start();
+
+            </script>
+ 
+    </body>
+</html>
