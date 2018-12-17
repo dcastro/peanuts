@@ -24,6 +24,7 @@ var GeoDataHelper = function () {
         for (var i = 0; i < data.length; i++) {
             if (!geo[data[i].targets_geo_city]) {
                 console.log('No location data for ' + JSON.stringify(data[i]))
+                continue;
             }
             data[i].lat = geo[data[i].targets_geo_city].latitude;
             data[i].lng = geo[data[i].targets_geo_city].longitude;
@@ -61,5 +62,6 @@ var GeoDataHelper = function () {
 
     }
 
+    init();
     return new GeoData();
 };
