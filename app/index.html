@@ -92,6 +92,21 @@
 
             <script type="text/javascript">
 
+
+                function calcPosFromLatLonRad(lat, lng,radius){
+
+                        var phi = (90 - lat) * Math.PI / 180;
+                        var theta = (180 - lng) * Math.PI / 180;
+
+                        var position = new THREE.Vector3(
+                            radius * Math.sin(phi) * Math.cos(theta),
+                            radius * Math.cos(phi),
+                            radius * Math.sin(phi) * Math.sin(theta)
+                        );
+
+                        return position;
+                    }
+
                     var setTexture = function(material, toSet) {
                         return function(texture) {
                             material[toSet] = texture;
@@ -108,7 +123,10 @@
                     var demoSettings =  {
                         data: {
                             hour: 0,
-                            glitch: 0
+                            glitch: 0,
+                            baseX: 0,
+                            baseY: 0,
+                            baseZ : 0
                         },
                         light : {
                             color :  new THREE.Color(0xFFFFFF),
@@ -165,9 +183,29 @@
                         app.loader.texture.load(demoSettings.globe.material.map).then(setTexture(sphereMaterial, "map"));
                         app.loader.texture.load(demoSettings.globe.material.bumpMap).then(setTexture(sphereMaterial, "bumpMap"));
                         app.loader.texture.load(demoSettings.globe.material.specularMap).then(setTexture(sphereMaterial, "specularMap"));
-                       
 
                         return sphereMesh;
+                    }
+
+
+                    function createLine(ep, color) {
+
+                        console.log(ep);
+
+                        var material = new THREE.LineBasicMaterial({
+                            color: color,
+                            linewidth: 100,
+                        });
+
+                        var geometry = new THREE.Geometry();
+                            geometry.vertices.push(
+                                new THREE.Vector3( 0, 0, 0 ),
+                                new THREE.Vector3( ep.x, ep.y, ep.z )
+                            );
+
+                        var line = new THREE.Line( geometry, material );
+                   
+                        return line;
                     }
 
                     function createGlobeOverlay(demoSettings) {
@@ -185,6 +223,8 @@
                         });
 
                         var sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
+
+             
 
                         //app.loader.texture.load(demoSettings.overlay.material.alphaMap).then(setTexture(sphereMaterial, "map"));
                         app.loader.texture.load(demoSettings.overlay.material.alphaMap).then(setTexture(sphereMaterial, "alphaMap"));
@@ -217,8 +257,8 @@
                         //     sobel_pass.renderToScreen = true;
                         
                          composer.addPass(new THREE.RenderPass(app.view.scene, app.view.camera));
-                         //composer.addPass(effectFilmBW);
-                         //composer.addPass(rgbshift);
+                         composer.addPass(effectFilmBW);
+                         composer.addPass(rgbshift);
                          composer.addPass(glitch);
                         // composer.addPass(sobel_pass);
  
@@ -229,6 +269,17 @@
                         console.log(demoSettings.data);
                         app.datGui.add(demoSettings.data, "hour", 0, 24);
                         app.datGui.add(demoSettings.data, "glitch", 0,1000);
+                        app.datGui.add(demoSettings.data, "baseX", 0, 360);
+                        app.datGui.add(demoSettings.data, "baseY", 0, 360);
+                        app.datGui.add(demoSettings.data, "baseZ", 0, 360);
+                        
+                    }
+
+                    function createLoading(demoSettings){
+
+                        let mesh = {};
+
+                        return mesh;
                     }
 
                     function createScene(demoSettings) {
@@ -247,6 +298,7 @@
 
                         var globe = createGlobe(demoSettings);
                         var globeOverlay = createGlobeOverlay(demoSettings);
+                        var loading = createLoading();
 
                         app.view.setScene(new THREE.Scene());
 
@@ -254,16 +306,40 @@
                         app.view.scene.add(app.view.camera);
                         app.view.scene.add(ambientLight);
                         app.view.scene.add(lightDirectional);
-                        app.view.scene.add(globe);
+                        app.view.scene.add(loading);
+               
                         //app.view.scene.add(globeOverlay);
 
-                        createPostProcessing(demoSettings);
+                        //createPostProcessing(demoSettings);
                         createControls(demoSettings);
-              
-    
+                        var loading = createLoading(demoSettings);
+
+                        app.view.scene.add(loading);
+
+                        var ironbarkService = new IronbarkService();
+
+                        const gd = GeoDataHelper();
+
+                        gd.init().then( ()=> {
+                            ironbarkService.topN("calls", "2018-12-16", "2018-12-17", "all").then(
+                                (data) => data.map( (item) => gd.addLatLng(item.result)),
+                                ex => console.log(ex)
+                            ).then( (data) => {
+                                console.log('data', data);
+                                data[0].map( (item) => {
+                                    app.view.scene.remove(loading);
+                                    app.view.scene.add(globe);
+                                    app.view.scene.add(
+                                        createLine(calcPosFromLatLonRad(item.lat, item.lng, 1020))
+                                    );   	
+                                })
+                            });
+                        });
+
                         return {
                             camera : app.view.camera,
-                            light : lightDirectional
+                            light : lightDirectional,
+                            globe : globe
                         };
                     }
 
@@ -273,6 +349,20 @@
 
                     app.view.onUpdate( function() {
 
+                    let rot  =  new THREE.Vector3(
+                        THREE.Math.degToRad(demoSettings.data.baseX),
+                        THREE.Math.degToRad(180),
+                        THREE.Math.degToRad(demoSettings.data.baseZ)
+                    );
+
+                    console.log(demoObjects.globe.rotation);
+
+                        console.log(demoObjects.globe.rotation);
+        
+        
+                        demoObjects.globe.rotation.setFromVector3(rot);
+
+           
                         //demoObjects.light.position.set(new THREE.Vector3(-55,50,-60));
                         demoObjects.light.position.copy( demoObjects.camera.position );
 
