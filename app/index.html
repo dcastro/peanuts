@@ -18,6 +18,10 @@
     <script src="/deps/three/build/three.min.js"></script>
     <script src="/deps/three/examples/js/controls/OrbitControls.js"></script>
 
+    <script src="/deps/papaparse/papaparse.js"></script>
+    <script src="/deps/lodash/lodash.js"></script>
+    <script src="/geo.js"></script>
+
     <script src="/peanuts/peanuts.js"></script>
     <script src="/peanuts/peanuts.three.driver.js"></script>
     <script src="/peanuts/peanuts.three.inputs.js"></script>
@@ -157,7 +161,6 @@
                         //demoObjects.light.position.set(new THREE.Vector3(-55,50,-60));
                         demoObjects.light.position.copy( demoObjects.camera.position );
 
-                        console.log('update called', demoObjects.light.position);
                     });
 
                     app.start();
