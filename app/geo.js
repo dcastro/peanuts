@@ -40,17 +40,17 @@ async function initGeoData() {
 async function addLatLng(data) {
     const geo = await initGeoData();
     for (var i = 0; i < data.length; i++) {
-        if (!geo[data[i].locId]) {
+        if (!geo[data[i].targets_geo_city]) {
             throw new Error('No location data for ' + JSON.stringify(data[i]))
         }
-        data[i].lat = geo[data[i].locId].latitude;
-        data[i].lng = geo[data[i].locId].longitude;
+        data[i].lat = geo[data[i].targets_geo_city].latitude;
+        data[i].lng = geo[data[i].targets_geo_city].longitude;
     }
     return Promise.resolve();
 }
 
 
-var druidResponseData = [{ locId: 63 }];
+var druidResponseData = [{ targets_geo_city: 63 }];
 addLatLng(druidResponseData).then(() => {
     console.log(druidResponseData);
 });
