@@ -189,9 +189,6 @@
 
 
                     function createLine(ep, color) {
-
-                        console.log(ep);
-
                         var material = new THREE.LineBasicMaterial({
                             color: color,
                             linewidth: 100,
@@ -266,13 +263,11 @@
                     }
 
                     function createControls(demoSettings) {
-                        console.log(demoSettings.data);
                         app.datGui.add(demoSettings.data, "hour", 0, 24);
                         app.datGui.add(demoSettings.data, "glitch", 0,1000);
                         app.datGui.add(demoSettings.data, "baseX", 0, 360);
                         app.datGui.add(demoSettings.data, "baseY", 0, 360);
                         app.datGui.add(demoSettings.data, "baseZ", 0, 360);
-                        
                     }
 
                     function createLoading(demoSettings){
@@ -325,7 +320,6 @@
                                 (data) => data.map( (item) => gd.addLatLng(item.result)),
                                 ex => console.log(ex)
                             ).then( (data) => {
-                                console.log('data', data);
                                 data[0].map( (item) => {
                                     app.view.scene.remove(loading);
                                     app.view.scene.add(globe);
@@ -349,23 +343,16 @@
 
                     app.view.onUpdate( function() {
 
-                    let rot  =  new THREE.Vector3(
-                        THREE.Math.degToRad(demoSettings.data.baseX),
-                        THREE.Math.degToRad(180),
-                        THREE.Math.degToRad(demoSettings.data.baseZ)
-                    );
-
-                    console.log(demoObjects.globe.rotation);
-
-                        console.log(demoObjects.globe.rotation);
-        
-        
+                        let rot  =  new THREE.Vector3(
+                            THREE.Math.degToRad(demoSettings.data.baseX),
+                            THREE.Math.degToRad(180),
+                            THREE.Math.degToRad(demoSettings.data.baseZ)
+                        );
+                        
                         demoObjects.globe.rotation.setFromVector3(rot);
 
-           
                         //demoObjects.light.position.set(new THREE.Vector3(-55,50,-60));
                         demoObjects.light.position.copy( demoObjects.camera.position );
-
                     });
 
                     app.start();
