@@ -11,9 +11,9 @@ var GeoDataHelper = function () {
     var dataCache;
 
     /**
-     * Url of maxmind csv file.
+     * Url of maxmind json data.
      */
-    const geoAssetUrl = "/assets/geo/GeoLiteCity-Location.csv";
+    const geoAssetUrl = "/assets/geo/geo-data.json";
 
     /**
      * Enhance data by lat and lng attributes.
@@ -28,8 +28,8 @@ var GeoDataHelper = function () {
                 console.log('No location data for ' + JSON.stringify(data[i]))
                 continue;
             }
-            data[i].lat = dataCache[data[i].targets_geo_city].latitude;
-            data[i].lng = dataCache[data[i].targets_geo_city].longitude;
+            data[i].lat = dataCache[data[i].targets_geo_city][0];
+            data[i].lng = dataCache[data[i].targets_geo_city][1];
         }
         return data;
     }
@@ -43,26 +43,10 @@ var GeoDataHelper = function () {
             return Promise.resolve(dataCache);
         }
 
-        return new Promise((resolve, reject) => {
-            Papa.parse(geoAssetUrl, {
-                download: true,
-                worker: true,
-                comments: 'Copyright',
-                header: true,
-                skipEmptyLines: 'greedy',
-                complete: (results) => {
-                    if (results.errors.length > 0) {
-                        reject(results.errors);
-                    } else {
-                        // keys: locId,country,region,city,postalCode,latitude,longitude,metroCode,areaCode
-                        dataCache = _.mapKeys(results.data, (v) => v.locId)
-                        resolve(dataCache);
-                    }
-                }
-            });
-        });
-
+        const response = await fetch(geoAssetUrl);
+        dataCache = await response.json();
     }
 
     return new GeoData();
 };
+
