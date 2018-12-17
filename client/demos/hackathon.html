@@ -32,27 +32,32 @@
     <script src="/app/ui/peanuts.three.dat.gui.geometry.js"></script>
 
     <style type="text/css">
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+
         .threeApp {
-            height: 440px;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
         }
     </style>
 
 </head>
 
-    <body class="page">
+    <body>
 
-        <div class="container">
-
-            <h1>Earth Demo</h1>
-
-            <h2>Sphere Geometry</h2>
 
             <div id="app" class="threeApp"></div>
 
             <script type="text/javascript">
 
-                (CodePrinter.printAndRun(function() {
-
+     
                     var app = new Peanuts.Three.App.Factory(
                         document.getElementById("app")
                     ).createDemoGLPerspectiveApp();
@@ -70,11 +75,14 @@
                                 heightSegments : 128
                             },
                             material: {
-                                opacity: 0.8,
+                                opacity: 1,
                                 wireframe : false,
                                 color :  new THREE.Color(0xFFFFFF),
-                                map: "/textures/earth/earthmap1k.jpg",
-                                bumpMap: "/textures/earth/earth-dark-bump.jpg"
+                                // map: "/textures/earth/earthmap1k.jpg",
+                                // bumpMap: "/textures/earth/earth-dark-bump.jpg"
+                                map: "/textures/earth/earth-dark-map.jpg",
+                                bumpMap: "/textures/earth/earth-dark-bump.jpg",
+                                specularMap: "/textures/earth/earthspec1k.jpg"
                             }
                         }
                     };
@@ -87,8 +95,8 @@
                             demoSettings.light.color,
                             demoSettings.light.intensity
                         );
-
-                        lightDirectional.position.copy(demoSettings.light.position);
+                        
+                        //lightDirectional.position.copy(demoSettings.light.position);
 
                         var lightDirectionalHelper = new THREE.DirectionalLightHelper(lightDirectional, 2);
 
@@ -127,17 +135,7 @@
                         ).then(setTexture(sphereMaterial, "specularMap"));
 
                         app.view.camera.position.set(0,0, demoSettings.globe.geometry.radius * -5);
-
-                        app.view.controls.enableRotate = false;
-                        app.view.controls.enabledZoom = true;
-                        app.view.controls.enablePan = false;
                         app.view.controls.update();
-
-                        app.inputs.mouse.events.onMouseMove.add(function(mouseState) {
-                            if( mouseState.pressed) {
-                                sphereMesh.rotateY(25 * mouseState.deltaPosNX);
-                            }
-                        });
 
                         app.view.setScene(new THREE.Scene());
 
@@ -146,15 +144,26 @@
                         app.view.scene.add(ambientLight);
                         app.view.scene.add(lightDirectional);
                         app.view.scene.add(sphereMesh);
+
+                        return {
+                            camera : app.view.camera,
+                            light : lightDirectional
+                        };
                     }
 
-                    createScene(demoSettings);
+                    var demoObjects = createScene(demoSettings);
+
+                    app.view.onUpdate( function() {
+
+                        //demoObjects.light.position.set(new THREE.Vector3(-55,50,-60));
+                        demoObjects.light.position.copy( demoObjects.camera.position );
+
+                        console.log('update called', demoObjects.light.position);
+                    });
 
                     app.start();
 
-                }))();
-
             </script>
-        </div>
+ 
     </body>
 </html>

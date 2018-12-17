@@ -35,7 +35,7 @@ Peanuts.Three.App.Builder = function (Peanuts) {
             })
         );
 
-        this.app.renderer.setClearColor(0x000000);
+        this.app.renderer.setClearColor(0x000000, 0);
 
         return this;
     };
