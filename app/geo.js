@@ -38,7 +38,7 @@ var GeoDataHelper = function () {
      * Load maxmind csv and return promise of it, keyed by location id.
      * @private
      */
-    var init = async function () {
+    GeoData.prototype.init = async function () {
         if (dataCache) {
             return Promise.resolve(dataCache);
         }
