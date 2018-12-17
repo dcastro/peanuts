@@ -23,7 +23,7 @@ var GeoDataHelper = function () {
         const geo = await init();
         for (var i = 0; i < data.length; i++) {
             if (!geo[data[i].targets_geo_city]) {
-                throw new Error('No location data for ' + JSON.stringify(data[i]))
+                console.log('No location data for ' + JSON.stringify(data[i]))
             }
             data[i].lat = geo[data[i].targets_geo_city].latitude;
             data[i].lng = geo[data[i].targets_geo_city].longitude;
