@@ -1,57 +1,73 @@
-// TODO: Merge with druid request
+var GeoDataHelper = function () {
 
-var geoData;
+    /**
+     * Constructor.
+     */
+    var GeoData = function () { };
 
-/**
- * Load maxmind csv and return promise of it, keyed by location id.
- */
-async function initGeoData() {
-    if (geoData) {
-        return Promise.resolve(geoData);
+    /**
+     * Cache of transformed geo file.
+     */
+    var dataCache;
+
+    /**
+     * Url of maxmind csv file.
+     */
+    const geoAssetUrl = "/assets/geo/GeoLiteCity-Location.csv";
+
+    /**
+     * Enhance data by lat and lng attributes.
+     * @param {*} data
+     */
+    GeoData.prototype.addLatLng = async function (data) {
+        const geo = await init();
+        for (var i = 0; i < data.length; i++) {
+            if (!geo[data[i].targets_geo_city]) {
+                throw new Error('No location data for ' + JSON.stringify(data[i]))
+            }
+            data[i].lat = geo[data[i].targets_geo_city].latitude;
+            data[i].lng = geo[data[i].targets_geo_city].longitude;
+        }
+        return Promise.resolve();
     }
 
-    const geoAssetUrl = "/assets/geo/GeoLiteCity-Location.csv";
-    return new Promise((resolve, reject) => {
-        Papa.parse(geoAssetUrl, {
-            download: true,
-            worker: true,
-            comments: 'Copyright',
-            header: true,
-            skipEmptyLines: 'greedy',
-            complete:
-                (results) => {
+    /**
+     * Load maxmind csv and return promise of it, keyed by location id.
+     * @private
+     */
+    var init = async function () {
+        if (dataCache) {
+            return Promise.resolve(dataCache);
+        }
+
+        return new Promise((resolve, reject) => {
+            Papa.parse(geoAssetUrl, {
+                download: true,
+                worker: true,
+                comments: 'Copyright',
+                header: true,
+                skipEmptyLines: 'greedy',
+                complete: (results) => {
                     if (results.errors.length > 0) {
                         reject(results.errors);
                     } else {
                         // keys: locId,country,region,city,postalCode,latitude,longitude,metroCode,areaCode
-                        geoData = _.mapKeys(results.data, (v) => v.locId)
-                        resolve(geoData);
+                        dataCache = _.mapKeys(results.data, (v) => v.locId)
+                        resolve(dataCache);
                     }
                 }
+            });
         });
-    });
 
-}
-
-/**
- * Enhance data by lat and lng attributes.
- * @param {*} data
- */
-async function addLatLng(data) {
-    const geo = await initGeoData();
-    for (var i = 0; i < data.length; i++) {
-        if (!geo[data[i].targets_geo_city]) {
-            throw new Error('No location data for ' + JSON.stringify(data[i]))
-        }
-        data[i].lat = geo[data[i].targets_geo_city].latitude;
-        data[i].lng = geo[data[i].targets_geo_city].longitude;
     }
-    return Promise.resolve();
-}
+
+    return new GeoData();
+};
 
 
+// Demo
 var druidResponseData = [{ targets_geo_city: 63 }];
-addLatLng(druidResponseData).then(() => {
+const gd = GeoDataHelper();
+gd.addLatLng(druidResponseData).then(() => {
     console.log(druidResponseData);
 });
-
