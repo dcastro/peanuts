@@ -1,0 +1,17 @@
+# ignore npm files
+node_modules
+npm-debug.log
+
+# ignore Mac files
+.DS_Store
+
+# ignore coverage report
+coverage
+
+# IDE settings
+.idea
+.vscode/*
+!.vscode/launch.json
+
+# Local settings
+.env
