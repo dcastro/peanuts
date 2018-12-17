@@ -116,6 +116,7 @@
                     };
 
 
+                    var clock = new THREE.Clock();
                     var app = new Peanuts.Three.App.Factory(
                         document.getElementById("app")
                     ).createDemoGLPerspectiveApp();
@@ -270,50 +271,50 @@
                         app.datGui.add(demoSettings.data, "baseZ", 0, 360);
                     }
 
-                    function createLoading(demoSettings){
-
-                        let mesh = {};
-
-                        return mesh;
-                    }
-
-                    function createScene(demoSettings) {
-
+                    function createLight(demoSettings) {
                         var ambientLight = new THREE.AmbientLight(0x444444);
+                        app.view.scene.add(ambientLight);
 
                         var lightDirectional = new THREE.DirectionalLight(
                             demoSettings.light.color,
                             demoSettings.light.intensity
                         );
-                        
-                        var lightDirectionalHelper = new THREE.DirectionalLightHelper(lightDirectional, 2);
+                        app.view.scene.add(lightDirectional);
 
+                        var pointLights = [];
+                        pointLights[0] = new THREE.PointLight( 0xff0000, 2, 3000 );
+                        pointLights[1] = new THREE.PointLight( 0x00ff00, 2, 4000 );
+                        pointLights[2] = new THREE.PointLight( 0x0000ff, 2, 5000 );
+                        for ( var i = 0, il = pointLights.length; i < il; i ++ ) {
+                            app.view.scene.add( pointLights[i] );
+                        }
+
+                        return {ambientLight, lightDirectional, pointLights}
+                    }
+
+                    function createScene(demoSettings) {
                         app.view.camera.position.set(0,0, -2400);
                         app.view.controls.update();
 
                         var globe = createGlobe(demoSettings);
                         var globeOverlay = createGlobeOverlay(demoSettings);
-                        var loading = createLoading();
 
                         app.view.setScene(new THREE.Scene());
 
                         app.view.scene.background = new THREE.Color(0,0x000000);
                         app.view.scene.add(app.view.camera);
-                        app.view.scene.add(ambientLight);
-                        app.view.scene.add(lightDirectional);
-                        app.view.scene.add(loading);
                
                         //app.view.scene.add(globeOverlay);
 
                         //createPostProcessing(demoSettings);
                         createControls(demoSettings);
-                        var loading = createLoading(demoSettings);
-
-                        app.view.scene.add(loading);
+                        const {lightDirectional, pointLights, ...rest} = createLight(demoSettings);
 
                         var ironbarkService = new IronbarkService();
 
                         const gd = GeoDataHelper();
+
+                        app.view.scene.add(globe);
 
                         gd.init().then( ()=> {
                             ironbarkService.topN("calls", "2018-12-16", "2018-12-17", "all").then(
@@ -321,7 +322,6 @@
                                 ex => console.log(ex)
                             ).then( (data) => {
                                 data[0].map( (item) => {
-                                    app.view.scene.remove(loading);
                                     app.view.scene.add(globe);
                                     app.view.scene.add(
                                         createLine(calcPosFromLatLonRad(item.lat, item.lng, 1020))
@@ -333,7 +333,8 @@
                         return {
                             camera : app.view.camera,
                             light : lightDirectional,
-                            globe : globe
+                            pointLights,
+                            globe,
                         };
                     }
 
@@ -353,6 +354,18 @@
 
                         //demoObjects.light.position.set(new THREE.Vector3(-55,50,-60));
                         demoObjects.light.position.copy( demoObjects.camera.position );
+
+
+                        var delta = clock.getDelta();
+                        var time = Date.now() * 0.0005;
+
+                        for ( var i = 1, il = demoObjects.pointLights.length; i <= il; i ++ ) {
+                            demoObjects.pointLights[i-1].position.set(
+                                Math.sin( time + i * 20.0 ) * 1000,
+                                Math.cos( time + i * 50.0 ) * 1000 + 1000,
+                                Math.cos( time + i * 70.0 ) * 1000,
+                            );
+                        }
                     });
 
                     app.start();
