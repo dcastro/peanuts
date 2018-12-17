@@ -63,11 +63,3 @@ var GeoDataHelper = function () {
 
     return new GeoData();
 };
-
-
-// Demo
-var druidResponseData = [{ targets_geo_city: 63 }];
-const gd = GeoDataHelper();
-gd.addLatLng(druidResponseData).then(() => {
-    console.log(druidResponseData);
-});
