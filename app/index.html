@@ -12,6 +12,7 @@
 
     <script src="/deps/papaparse/papaparse.js"></script>
     <script src="/deps/lodash/lodash.js"></script>
+    <script src="/assets/geo/geo-data.js"></script>
     <script src="/geo.js"></script>
     <script src="/ironbarkService.js"></script>
 
@@ -317,20 +318,21 @@
 
                         const gd = GeoDataHelper();
 
-                        app.view.scene.add(globe);
+                        ironbarkService.topN("calls", "2018-12-16", "2018-12-17", "all").then(
+                            (data) => data.map( (item) => gd.addLatLng(item.result)),
+                            ex => console.log(ex)
+                        ).then( (data) => {
+                            app.view.scene.add(globe);
 
-                        gd.init().then( ()=> {
-                            ironbarkService.topN("calls", "2018-12-16", "2018-12-17", "all").then(
-                                (data) => data.map( (item) => gd.addLatLng(item.result)),
-                                ex => console.log(ex)
-                            ).then( (data) => {
-                                data[0].map( (item) => {
-                                    app.view.scene.add(globe);
-                                    app.view.scene.add(
-                                        createLine(calcPosFromLatLonRad(item.lat, item.lng, 1020))
-                                    );   	
-                                })
-                            });
+                            const max = _.maxBy(data[0], 'calls').calls;
+
+                            data[0].map( (item) => {
+                                const normalizedValue = 1000 + (item.calls / max) * 1000;
+                                console.log(max, normalizedValue);
+                                app.view.scene.add(
+                                    createLine(calcPosFromLatLonRad(item.lat, item.lng, normalizedValue))
+                                );
+                            })
                         });
 
                         return {
