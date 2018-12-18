@@ -124,6 +124,10 @@
                     var demoSettings =  {
                         data: {
                             glitch: 0,
+                            hour: 0,
+                            max: 1,
+                            stoof: [],
+                            cylinders: []
                         },
                         light : {
                             color :  new THREE.Color(0xFFFFFF),
@@ -289,8 +293,34 @@
                          app.view.setComposer(composer);
                     }
 
+                    function modelDataAsCylinders(data, max, hour){
+                        let cylinders = [];
+
+                        data[hour].map((item) => {
+                            const normalizedValue = 1000 + (item.calls / max) * 1000;
+                            const color = Math.round((item.calls / max) * 255)
+                            const colorRgb = new THREE.Color(`rgb(${color},${255 - color},0)`)
+                            cylinders.push(
+                                createCylinder(item.lat, item.lng, normalizedValue, colorRgb)
+                            );
+
+                        })
+                        return cylinders;
+                    }
+
                     function createControls(demoSettings) {
-                        app.datGui.add(demoSettings.data, "glitch", 0,1000);
+                        app.datGui.add(demoSettings.data, "glitch", 0, 1000);
+                        app.datGui.add(demoSettings.data, "hour", 0, 23)
+                            .onChange(x => {
+
+                                demoSettings.data.cylinders.map(c => app.view.scene.remove(c))
+                                demoSettings.data.cylinders = modelDataAsCylinders(demoSettings.data.stoof, demoSettings.data.max, x)
+                                demoSettings.data.cylinders.map(c =>
+                                    app.view.scene.add(c)
+                                );
+
+                            })
+                            .step(1)
                     }
 
                     function createLight(demoSettings) {
@@ -339,26 +369,24 @@
 
                         const coordsHelper = new CoordinatesHelper();
 
-                        ironbarkService.topN("calls", "2018-12-16", "2018-12-17", "all").then(
+                        ironbarkService.topN("calls", "2018-12-16", "2018-12-17", "hour").then(
                             (data) => data.map( (item) => coordsHelper.addLatLng(item.result)),
                             ex => console.log(ex)
                         ).then( (data) => {
                             app.view.scene.add(globe);
 
-                            data[0].splice(0,2)
-
-                            //const max = _.maxBy(data[0], 'calls').calls;
-                            const max = data[0][0].calls;
-
-                            data[0].map( (item) => {
-                                const normalizedValue = 1000 + (item.calls / max) * 1000;
-                                const color = Math.round((item.calls / max) * 255)
-                                const colorRgb = new THREE.Color(`rgb(${color},${255-color},0)`)
-                                app.view.scene.add(
-                                    //createLine(calcPosFromLatLonRad(item.lat, item.lng, normalizedValue))
-                                    createCylinder(item.lat, item.lng, normalizedValue, colorRgb)
-                                );
+                            demoSettings.data.stoof = data.map(x => {
+                                x.splice(0,2)
+                                return x;
                             })
+
+                            demoSettings.data.max = _.maxBy(demoSettings.data.stoof.map(x=>x[0]), 'calls').calls;
+
+                            demoSettings.data.cylinders = modelDataAsCylinders(demoSettings.data.stoof, demoSettings.data.max, demoSettings.data.hour)
+                            demoSettings.data.cylinders.map(c =>
+                                app.view.scene.add(c)
+                            );
+
                         });
 
                         return {
@@ -380,6 +408,8 @@
                             THREE.Math.degToRad(180),
                             THREE.Math.degToRad(0)
                         );
+
+
 
                         demoObjects.globe.rotation.setFromVector3(rot);
 
