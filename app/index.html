@@ -16,6 +16,8 @@
     <script src="/coordinatesHelper.js"></script>
     <script src="/ironbarkService.js"></script>
 
+    <script src="/threex.atmospherematerial.js"></script>
+
     <script src="/deps/highlightjs/highlight.pack.min.js"></script>
     <script src="/deps/dat.gui/build/dat.gui.min.js"></script>
     <script src="/deps/stats-js/build/stats.min.js"></script>
@@ -24,6 +26,8 @@
     <script src="/deps/three/build/three.min.js"></script>
     <script src="/deps/three/examples/js/controls/OrbitControls.js"></script>
 
+
+    <script src="/deps/three/examples/js/loaders/TGALoader.js"></script>
 
     <script src="/deps/three/examples/js/shaders/BleachBypassShader.js"></script>
     <script src="/deps/three/examples/js/shaders/ColorifyShader.js"></script>
@@ -124,7 +128,7 @@
                         }, 
                         overlay : {
                             geometry: {
-                                radius : 1010,
+                                radius : 34,
                                 widthSegments :64,
                                 heightSegments : 64
                             },
@@ -138,7 +142,7 @@
                         },
                         globe : {
                             geometry: {
-                                radius : 1000,
+                                radius : 32,
                                 widthSegments :256,
                                 heightSegments : 256
                             },
@@ -177,6 +181,36 @@
                         return sphereMesh;
                     }
 
+                    function createAtmosphere(demoSettings) {
+
+                        var geometry	= new THREE.SphereGeometry(
+                            demoSettings.globe.geometry.radius * 1.01,
+                            demoSettings.globe.geometry.widthSegments,
+                            demoSettings.globe.geometry.heightSegments
+                        )
+                        var material	= THREEx.createAtmosphereMaterial()
+                        material.uniforms.glowColor.value	= new THREE.Color(0xFFFFFF);
+                        var atmosphere1	= new THREE.Mesh(geometry, material );
+
+
+                        var geometry	= new THREE.SphereGeometry(
+                            demoSettings.globe.geometry.radius + 1,
+                            demoSettings.globe.geometry.widthSegments,
+                            demoSettings.globe.geometry.heightSegments
+                        )
+                        var material	= THREEx.createAtmosphereMaterial();
+                        material.side	= THREE.BackSide;
+                        material.uniforms.coeficient.value	= 0.56;
+                        material.uniforms.power.value		= 5.1;
+                        material.uniforms.glowColor.value	= new THREE.Color(0xFFFFFF);
+                        var atmosphere2	= new THREE.Mesh(geometry, material );
+
+                        new THREEx.addAtmosphereMaterial2DatGui(material, app.datGUI)
+
+
+                        return {atmosphere1, atmosphere2};
+                    }
+
 
                     function createLine(ep, color) {
                         var material = new THREE.LineBasicMaterial({
@@ -190,9 +224,13 @@
                                 new THREE.Vector3( ep.x, ep.y, ep.z )
                             );
 
-                        var line = new THREE.Line( geometry, material );
-                   
-                        return line;
+                        return new THREE.Line( geometry, material );
+                    }
+
+                    function createPointLight(ep) {
+                        const pl = new THREE.PointLight( 0xFFFFFF, 5, 10 );
+                        pl.position.set(ep.x, ep.y, ep.z)
+                        return pl;
                     }
 
                     function createGlobeOverlay(demoSettings) {
@@ -244,12 +282,33 @@
                         //     sobel_pass.renderToScreen = true;
                         
                          composer.addPass(new THREE.RenderPass(app.view.scene, app.view.camera));
-                         composer.addPass(effectFilmBW);
+                         // composer.addPass(effectFilmBW);
                          composer.addPass(rgbshift);
                          composer.addPass(glitch);
                         // composer.addPass(sobel_pass);
  
-                         app.view.setComposer(composer);
+                        app.view.setComposer(composer);
+                    }
+
+                    function createSkyBox(demoSettings) {
+                        var imagePrefix = "/assets/textures/skybox/";
+                        var directions = ["purplenebula_rt", "purplenebula_lf", "purplenebula_up", "purplenebula_dn", "purplenebula_ft", "purplenebula_bk"];
+                        var imageSuffix = ".tga";
+                        var skyGeometry = new THREE.CubeGeometry(2000, 2000, 2000);
+
+                        var materialArray = [];
+                        var loader = new THREE.TGALoader();
+
+                        for (var i = 0; i < 6; i++) {
+                            materialArray.push(new THREE.MeshBasicMaterial({
+                                map: loader.load(imagePrefix + directions[i] + imageSuffix),
+                                side: THREE.BackSide
+                            }));
+                        }
+                        
+                        var skyMaterial = new THREE.MeshFaceMaterial(materialArray);
+                        return new THREE.Mesh(skyGeometry, skyMaterial);
+
                     }
 
                     function createControls(demoSettings) {
@@ -281,20 +340,30 @@
                     }
 
                     function createScene(demoSettings) {
-                        app.view.camera.position.set(0,0, -2400);
+                        app.view.camera.position.set(0,0, -500);
+                        app.view.controls.enableDamping = true;
+                        app.view.controls.maxDistance = 500;
+                        app.view.controls.minDistance = 50;
                         app.view.controls.update();
 
                         var globe = createGlobe(demoSettings);
+                        var {atmosphere1, atmosphere2} = createAtmosphere(demoSettings);
                         // var globeOverlay = createGlobeOverlay(demoSettings);
-
+                        
                         app.view.setScene(new THREE.Scene());
-
+                        
                         app.view.scene.background = new THREE.Color(0,0x000000);
                         app.view.scene.add(app.view.camera);
-               
+                        
+                        app.view.scene.add(atmosphere2);
+                        app.view.scene.add(atmosphere1);
+
+                        const skybox = createSkyBox(demoSettings);
+                        app.view.scene.add(skybox);
+
                         //app.view.scene.add(globeOverlay);
 
-                        //createPostProcessing(demoSettings);
+                        // createPostProcessing(demoSettings);
                         createControls(demoSettings);
                         const {lightDirectional, pointLights, ...rest} = createLight(demoSettings);
 
@@ -308,13 +377,17 @@
                         ).then( (data) => {
                             app.view.scene.add(globe);
 
-                            const max = _.maxBy(data[0], 'calls').calls;
+                            data[0] = data[0].slice(1);
+                            const lights = data[0].slice(1, 10);
+                            const max = data[0][0].calls;
+
+                            lights.map((item) => {
+                                app.view.scene.add(createPointLight(calcPosFromLatLonRad(item.lat, item.lng, demoSettings.globe.geometry.radius + 1)));
+                            });
 
                             data[0].map( (item) => {
-                                const normalizedValue = 1000 + (item.calls / max) * 1000;
-                                app.view.scene.add(
-                                    createLine(calcPosFromLatLonRad(item.lat, item.lng, normalizedValue))
-                                );
+                                const normalizedValue = demoSettings.globe.geometry.radius + (item.calls / max) * demoSettings.globe.geometry.radius;
+                                app.view.scene.add(createLine(calcPosFromLatLonRad(item.lat, item.lng, normalizedValue)));
                             })
                         });
 

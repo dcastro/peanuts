@@ -10,7 +10,6 @@ IronbarkService.prototype.topN = function (metric, from, to, granularity) {
         xhr.setRequestHeader("Content-Type", "application/json");
 
         xhr.onreadystatechange = function () { // Call a function when the state changes.
-            console.log(this.readyState, this.status);
             if (this.readyState === XMLHttpRequest.DONE) {
                 if (this.status === 200) {
                     resolve(JSON.parse(xhr.responseText))
