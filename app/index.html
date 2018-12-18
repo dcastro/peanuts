@@ -370,9 +370,10 @@
                         app.datGui.add(demoSettings.data, "hour", 0, 23)
                             .onChange(x => {
 
-                                app.view.scene.remove(demoSettings.data.cylinders);
+                                demoObjects.model.remove(demoSettings.data.cylinders);
                                 demoSettings.data.cylinders = modelDataAsCylinders(demoSettings.data.stoof, demoSettings.data.max, x)
-                                app.view.scene.add(demoSettings.data.cylinders);
+                                demoObjects.model.add(demoSettings.data.cylinders);
+
                             })
                             .step(1)
                     }
@@ -433,11 +434,14 @@
 
                         const coordsHelper = new CoordinatesHelper();
 
+                        const modelGroup = new THREE.Group();
+                        modelGroup.add(globe);
+                        app.view.scene.add(modelGroup);
+
                         ironbarkService.topN("calls", "2018-12-16", "2018-12-17", "hour").then(
                             (data) => data.map( (item) => coordsHelper.addLatLng(item.result)),
                             ex => console.log(ex)
                         ).then( (data) => {
-                            app.view.scene.add(globe);
 
                             demoSettings.data.stoof = data.map(x => {
                                 x.splice(0,2)
@@ -452,8 +456,7 @@
                             demoSettings.data.max = demoSettings.data.stoof[0][0].calls;
 
                             demoSettings.data.cylinders = modelDataAsCylinders(demoSettings.data.stoof, demoSettings.data.max, demoSettings.data.hour)
-                            app.view.scene.add(demoSettings.data.cylinders);
-
+                            modelGroup.add(demoSettings.data.cylinders);
 
                         });
 
@@ -462,22 +465,21 @@
                             light : lightDirectional,
                             pointLights,
                             globe,
+                            model: modelGroup,
                         };
                     }
 
                     var demoObjects = createScene(demoSettings);
-
-                    app.view.onUpdate( function() {
-
-                        let rot  =  new THREE.Vector3(
+                    demoObjects.globe.rotation.setFromVector3(new THREE.Vector3(
                             THREE.Math.degToRad(0),
                             THREE.Math.degToRad(180),
                             THREE.Math.degToRad(0)
-                        );
+                    ));
 
 
+                    app.view.onUpdate( function() {
 
-                        demoObjects.globe.rotation.setFromVector3(rot);
+                        demoObjects.model.rotateX(0.01);
 
                         //demoObjects.light.position.set(new THREE.Vector3(-55,50,-60));
                         demoObjects.light.position.copy( demoObjects.camera.position );
