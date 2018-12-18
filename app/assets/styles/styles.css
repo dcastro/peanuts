@@ -51,3 +51,9 @@ body {
 .threeApp canvas {
   border-radius: 4px;
 }
+
+
+select {
+  color: initial;
+}
+

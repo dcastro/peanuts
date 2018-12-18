@@ -122,6 +122,7 @@
                             glitch: 0,
                             hour: 0,
                             max: 1,
+                            metric: 'calls',
                             stoof: [],
                             cylinders: []
                         },
@@ -354,8 +355,10 @@
                         let cylinders = new THREE.Group();
 
                         data[hour].map((item) => {
-                            const normalizedValue = item.calls / max;
-                            const color = Math.round((item.calls / max) * 255)
+                            const metric = demoSettings.data.metric;
+
+                            const normalizedValue = item[metric] / max;
+                            const color = Math.round((item[metric] / max) * 255)
                             const colorRgb = new THREE.Color(`rgb(${color},${255 - color},0)`)
                             cylinders.add(
                                 createCylinder(item.targets_geo_city, item.lat, item.lng, normalizedValue, colorRgb)
@@ -375,6 +378,12 @@
                                 app.view.scene.add(demoSettings.data.cylinders);
                             })
                             .step(1)
+
+                        app.datGui.add(demoSettings.data, 'metric', ['calls', 'count', 'impressions', 'completedViews', 'clicks', 'payout'])
+                            .onChange(x => {
+                                app.view.scene.remove(demoSettings.data.cylinders);
+                                loadDruidData(demoSettings);
+                            });
                     }
 
                     function createLight(demoSettings) {
@@ -429,33 +438,8 @@
                         createControls(demoSettings);
                         const {lightDirectional, pointLights, ...rest} = createLight(demoSettings);
 
-                        var ironbarkService = new IronbarkService();
-
-                        const coordsHelper = new CoordinatesHelper();
-
-                        ironbarkService.topN("calls", "2018-12-16", "2018-12-17", "hour").then(
-                            (data) => data.map( (item) => coordsHelper.addLatLng(item.result)),
-                            ex => console.log(ex)
-                        ).then( (data) => {
-                            app.view.scene.add(globe);
-
-                            demoSettings.data.stoof = data.map(x => {
-                                x.splice(0,2)
-                                return x;
-                            })
-
-                          /*  const lights = demoSettings.data.stoof[0].slice(1, 10);
-                            lights.map((item) => {
-                                app.view.scene.add(createPointLight(calcPosFromLatLonRad(item.lat, item.lng, demoSettings.globe.geometry.radius + 1)));
-                            }); */
-
-                            demoSettings.data.max = demoSettings.data.stoof[0][0].calls;
-
-                            demoSettings.data.cylinders = modelDataAsCylinders(demoSettings.data.stoof, demoSettings.data.max, demoSettings.data.hour)
-                            app.view.scene.add(demoSettings.data.cylinders);
-
-
-                        });
+                        app.view.scene.add(globe);
+                        loadDruidData(demoSettings);
 
                         return {
                             camera : app.view.camera,
@@ -463,6 +447,30 @@
                             pointLights,
                             globe,
                         };
+                    }
+
+                    function loadDruidData(demoSettings) {
+                        const ironbarkService = new IronbarkService();
+
+                        const coordsHelper = new CoordinatesHelper();
+
+                        ironbarkService.topN(demoSettings.data.metric, "2018-12-16", "2018-12-17", "hour").then(
+                            (data) => data.map( (item) => coordsHelper.addLatLng(item.result)),
+                            ex => console.log(ex)
+                        ).then( (data) => {
+
+                            demoSettings.data.stoof = data.map(x => {
+                                x.splice(0,2)
+                                return x;
+                            })
+
+                            demoSettings.data.max = demoSettings.data.stoof[0][0][demoSettings.data.metric];
+
+                            demoSettings.data.cylinders = modelDataAsCylinders(demoSettings.data.stoof, demoSettings.data.max, demoSettings.data.hour)
+                            app.view.scene.add(demoSettings.data.cylinders);
+
+
+                        });
                     }
 
                     var demoObjects = createScene(demoSettings);
