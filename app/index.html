@@ -209,17 +209,14 @@
                         material.uniforms.glowColor.value	= new THREE.Color(0xFFFFFF);
                         var atmosphere2	= new THREE.Mesh(geometry, material );
 
-                        new THREEx.addAtmosphereMaterial2DatGui(material, app.datGUI)
-
-
                         return {atmosphere1, atmosphere2};
                     }
 
 
                     function createCylinder(lat, lng, height, color, width) {
                         var cylinderGeometry = new THREE.CylinderGeometry(
-                            3,
-                            1,
+                            0.1,
+                            0.1,
                             height,
                             10,
                             1,
@@ -349,7 +346,7 @@
                         let cylinders = [];
 
                         data[hour].map((item) => {
-                            const normalizedValue = 1000 + (item.calls / max) * 1000;
+                            const normalizedValue = 32 + (item.calls / max) * 32;
                             const color = Math.round((item.calls / max) * 255)
                             const colorRgb = new THREE.Color(`rgb(${color},${255 - color},0)`)
                             cylinders.push(
@@ -442,12 +439,12 @@
                                 return x;
                             })
 
-                            const lights = demoSettings.data.stoof.slice(1, 10);
+                            const lights = demoSettings.data.stoof[0].slice(1, 10);
                             lights.map((item) => {
                                 app.view.scene.add(createPointLight(calcPosFromLatLonRad(item.lat, item.lng, demoSettings.globe.geometry.radius + 1)));
                             });
 
-                            demoSettings.data.max = demoSettings.data.stoof[0].calls;
+                            demoSettings.data.max = demoSettings.data.stoof[0][0].calls;
 
                             demoSettings.data.cylinders = modelDataAsCylinders(demoSettings.data.stoof, demoSettings.data.max, demoSettings.data.hour)
                             demoSettings.data.cylinders.map(c =>
