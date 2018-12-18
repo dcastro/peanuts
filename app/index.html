@@ -515,6 +515,33 @@
 
                     var demoObjects = createScene(demoSettings);
 
+                    var loader = new THREE.ObjectLoader();
+                    loader.load(
+                        // resource URL
+                        "/assets/sprites/tardis/tardis.json",
+
+                        // onLoad callback
+                        // Here the loaded data is assumed to be an object
+                        function ( obj ) {
+                            // Add the loaded object to the scene
+                            obj.scale.set(0.3,0.3,0.3)
+                            //obj.translateY(30)
+                            obj.translateX(-40)
+                            demoObjects.tardis = obj;
+                            app.view.scene.add( obj );
+                        },
+
+                        // onProgress callback
+                        function ( xhr ) {
+                            console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+                        },
+
+                        // onError callback
+                        function ( err ) {
+                            console.error( 'An error happened' );
+                        }
+                    );
+
                     app.view.onUpdate( function() {
 
                         let rot  =  new THREE.Vector3(
@@ -523,6 +550,11 @@
                             THREE.Math.degToRad(0)
                         );
 
+                        if(demoObjects.tardis) {
+                            demoObjects.tardis.translateX(40)
+                            demoObjects.tardis.rotateY(0.01);
+                            demoObjects.tardis.translateX(-40)
+                        }
 
 
                         demoObjects.globe.rotation.setFromVector3(rot);
@@ -542,6 +574,7 @@
                             );
                         }
                     });
+
 
                     app.start();
 
