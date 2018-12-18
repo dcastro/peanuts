@@ -111,7 +111,7 @@
                         };
                     };
 
-
+                    var cylinderCache = [];
                     var clock = new THREE.Clock();
                     var app = new Peanuts.Three.App.Factory(
                         document.getElementById("app")
@@ -213,34 +213,42 @@
                     }
 
 
-                    function createCylinder(lat, lng, height, color, width) {
-                        var cylinderGeometry = new THREE.CylinderGeometry(
-                            0.1,
-                            0.1,
-                            height,
-                            10,
-                            1,
-                            false,
-                            0,
-                            2 * Math.PI
-                        );
-                        var cylinderMaterial = new THREE.MeshBasicMaterial({
-                            wireframe: false,
-                            color: color
-                        });
-                        var cylinderMesh = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
+                    function createCylinder(key, lat, lng, height, color, width) {
+                        if (!cylinderCache[key]) {
+                            var cylinderGeometry = new THREE.CylinderBufferGeometry(
+                                0.1,
+                                0.1,
+                                10,
+                                10,
+                                1,
+                                false,
+                                0,
+                                2 * Math.PI
+                            );
+                            var cylinderMaterial = new THREE.MeshBasicMaterial({
+                                wireframe: false,
+                                color: color
+                            });
+                            var cylinderMesh = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
 
-                        cylinderMesh.rotation.setFromVector3(
-                            new THREE.Vector3(
-                                THREE.Math.degToRad(0),
-                                THREE.Math.degToRad(lng),
-                                THREE.Math.degToRad(90-lat)
-                            )
-                        );
+                            
+                            cylinderMesh.rotation.setFromVector3(
+                                new THREE.Vector3(
+                                    THREE.Math.degToRad(0),
+                                    THREE.Math.degToRad(lng),
+                                    THREE.Math.degToRad(90-lat)
+                                    )
+                                );
+                                
+                            cylinderCache[key] = cylinderMesh;
+                        }
 
-                        cylinderMesh.translateY(height/2);
-
-                        return cylinderMesh;
+                        cylinderCache[key].position.set(0, 0, 0);
+                        cylinderCache[key].translateY(5);
+                        cylinderCache[key].translateY(22);
+                        cylinderCache[key].translateY(height * 10);
+             
+                        return cylinderCache[key];
                     }
 
                     function createLine(ep, color) {
@@ -343,14 +351,14 @@
                     }
 
                     function modelDataAsCylinders(data, max, hour){
-                        let cylinders = [];
+                        let cylinders = new THREE.Group();
 
                         data[hour].map((item) => {
-                            const normalizedValue = 32 + (item.calls / max) * 32;
+                            const normalizedValue = item.calls / max;
                             const color = Math.round((item.calls / max) * 255)
                             const colorRgb = new THREE.Color(`rgb(${color},${255 - color},0)`)
-                            cylinders.push(
-                                createCylinder(item.lat, item.lng, normalizedValue, colorRgb)
+                            cylinders.add(
+                                createCylinder(item.targets_geo_city, item.lat, item.lng, normalizedValue, colorRgb)
                             );
 
                         })
@@ -362,12 +370,9 @@
                         app.datGui.add(demoSettings.data, "hour", 0, 23)
                             .onChange(x => {
 
-                                demoSettings.data.cylinders.map(c => app.view.scene.remove(c))
+                                app.view.scene.remove(demoSettings.data.cylinders);
                                 demoSettings.data.cylinders = modelDataAsCylinders(demoSettings.data.stoof, demoSettings.data.max, x)
-                                demoSettings.data.cylinders.map(c =>
-                                    app.view.scene.add(c)
-                                );
-
+                                app.view.scene.add(demoSettings.data.cylinders);
                             })
                             .step(1)
                     }
@@ -439,17 +444,16 @@
                                 return x;
                             })
 
-                            const lights = demoSettings.data.stoof[0].slice(1, 10);
+                          /*  const lights = demoSettings.data.stoof[0].slice(1, 10);
                             lights.map((item) => {
                                 app.view.scene.add(createPointLight(calcPosFromLatLonRad(item.lat, item.lng, demoSettings.globe.geometry.radius + 1)));
-                            });
+                            }); */
 
                             demoSettings.data.max = demoSettings.data.stoof[0][0].calls;
 
                             demoSettings.data.cylinders = modelDataAsCylinders(demoSettings.data.stoof, demoSettings.data.max, demoSettings.data.hour)
-                            demoSettings.data.cylinders.map(c =>
-                                app.view.scene.add(c)
-                            );
+                            app.view.scene.add(demoSettings.data.cylinders);
+
 
                         });
 
@@ -460,8 +464,6 @@
                             globe,
                         };
                     }
-
-
 
                     var demoObjects = createScene(demoSettings);
 
