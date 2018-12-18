@@ -282,9 +282,12 @@
                         app.view.scene.add(lightDirectional);
 
                         var pointLights = [];
-                        pointLights[0] = new THREE.PointLight( 0xff0000, 2, 3000 );
-                        pointLights[1] = new THREE.PointLight( 0x00ff00, 2, 4000 );
+                        pointLights[0] = new THREE.PointLight( 0xff0000, 2, 5000 );
+                        pointLights[1] = new THREE.PointLight( 0x00ff00, 2, 5000 );
                         pointLights[2] = new THREE.PointLight( 0x0000ff, 2, 5000 );
+                        pointLights[3] = new THREE.PointLight( 0xff0000, 5, 3000 );
+                        pointLights[4] = new THREE.PointLight( 0x00ff00, 5, 3000 );
+                        pointLights[5] = new THREE.PointLight( 0x0000ff, 5, 3000 );
                         for ( var i = 0, il = pointLights.length; i < il; i ++ ) {
                             app.view.scene.add( pointLights[i] );
                         }
@@ -357,13 +360,13 @@
 
 
                         var delta = clock.getDelta();
-                        var time = Date.now() * 0.0005;
+                        var time = Date.now() * 0.0004;
 
                         for ( var i = 1, il = demoObjects.pointLights.length; i <= il; i ++ ) {
                             demoObjects.pointLights[i-1].position.set(
-                                Math.sin( time + i * 20.0 ) * 1000,
-                                Math.cos( time + i * 50.0 ) * 1000 + 1000,
-                                Math.cos( time + i * 70.0 ) * 1000,
+                                3000 * Math.sin(time + i) * Math.cos(i),
+                                3000 * Math.cos(time + i),
+                                3000 * Math.sin(time + i) * Math.sin(i)
                             );
                         }
                     });
