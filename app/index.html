@@ -67,15 +67,7 @@
     <script src="/peanuts/ui/peanuts.three.dat.gui.geometry.js"></script>
 
     <style type="text/css">
-
-        body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 100%;
-        }
-
-        .threeApp {
+        body, .threeApp {
             margin: 0;
             padding: 0;
             height: 100%;
@@ -156,7 +148,8 @@
                                 shininess: 70,
                                 color :  new THREE.Color(0xFFFFFF),
                                 map: "/textures/earth/earth-dark-map.jpg",
-                                bumpMap: "/textures/earth/earth-dark-bump.jpg"
+                                bumpMap: "/textures/earth/earth-dark-bump.jpg",
+                                specularMap: "/textures/earth/earthspec1k.jpg",
                             }
                         }
                     };
@@ -292,7 +285,7 @@
                         app.view.controls.update();
 
                         var globe = createGlobe(demoSettings);
-                        var globeOverlay = createGlobeOverlay(demoSettings);
+                        // var globeOverlay = createGlobeOverlay(demoSettings);
 
                         app.view.setScene(new THREE.Scene());
 
