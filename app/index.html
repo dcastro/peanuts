@@ -13,9 +13,8 @@
     <script src="/deps/papaparse/papaparse.js"></script>
     <script src="/deps/lodash/lodash.js"></script>
     <script src="/assets/geo/geo-data.js"></script>
-    <script src="/geo.js"></script>
+    <script src="/coordinatesHelper.js"></script>
     <script src="/ironbarkService.js"></script>
-
 
     <script src="/deps/highlightjs/highlight.pack.min.js"></script>
     <script src="/deps/dat.gui/build/dat.gui.min.js"></script>
@@ -124,11 +123,7 @@
 
                     var demoSettings =  {
                         data: {
-                            hour: 0,
                             glitch: 0,
-                            baseX: 0,
-                            baseY: 0,
-                            baseZ : 0
                         },
                         light : {
                             color :  new THREE.Color(0xFFFFFF),
@@ -265,11 +260,7 @@
                     }
 
                     function createControls(demoSettings) {
-                        app.datGui.add(demoSettings.data, "hour", 0, 24);
                         app.datGui.add(demoSettings.data, "glitch", 0,1000);
-                        app.datGui.add(demoSettings.data, "baseX", 0, 360);
-                        app.datGui.add(demoSettings.data, "baseY", 0, 360);
-                        app.datGui.add(demoSettings.data, "baseZ", 0, 360);
                     }
 
                     function createLight(demoSettings) {
@@ -316,10 +307,10 @@
 
                         var ironbarkService = new IronbarkService();
 
-                        const gd = GeoDataHelper();
+                        const coordsHelper = new CoordinatesHelper();
 
                         ironbarkService.topN("calls", "2018-12-16", "2018-12-17", "all").then(
-                            (data) => data.map( (item) => gd.addLatLng(item.result)),
+                            (data) => data.map( (item) => coordsHelper.addLatLng(item.result)),
                             ex => console.log(ex)
                         ).then( (data) => {
                             app.view.scene.add(globe);
@@ -328,7 +319,6 @@
 
                             data[0].map( (item) => {
                                 const normalizedValue = 1000 + (item.calls / max) * 1000;
-                                console.log(max, normalizedValue);
                                 app.view.scene.add(
                                     createLine(calcPosFromLatLonRad(item.lat, item.lng, normalizedValue))
                                 );
@@ -350,9 +340,9 @@
                     app.view.onUpdate( function() {
 
                         let rot  =  new THREE.Vector3(
-                            THREE.Math.degToRad(demoSettings.data.baseX),
+                            THREE.Math.degToRad(0),
                             THREE.Math.degToRad(180),
-                            THREE.Math.degToRad(demoSettings.data.baseZ)
+                            THREE.Math.degToRad(0)
                         );
                         
                         demoObjects.globe.rotation.setFromVector3(rot);
