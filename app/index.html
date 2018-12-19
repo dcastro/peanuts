@@ -257,7 +257,7 @@
                                 0.1,
                                 0.1,
                                 9.99,
-                                10,
+                                6,
                                 1,
                                 false,
                                 0,
@@ -397,7 +397,7 @@
                     }
 
                     function modelDataAsCylinders(data, max, hour){
-                        let cylinders = new Array();
+                        let cylinders = {};
 
                         data[hour].map((item) => {
                             const metric = demoSettings.data.metric;
@@ -418,28 +418,15 @@
                         app.datGui.add(demoSettings.data, 'metric', ['calls', 'count', 'impressions', 'completedViews', 'clicks', 'payout'])
                             .onChange(x => {
                                 loadDruidData(demoSettings);
-                            })
-                            .step(1)
+                            });
                     }
 
                     document.getElementById('hourRange').oninput = function() {
-                        const newHour = this.value;
+                        demoSettings.data.hour = this.value
 
-                        demoSettings.data.max = demoSettings.data.stoof[newHour][0].calls;
-
-                        const changedCylinders = modelDataAsCylinders(demoSettings.data.stoof, demoSettings.data.max, newHour);
-
-                        const keysToBeRemoved = _.difference(Object.keys(cylinderCache), Object.keys(changedCylinders));
-                        for (const key of keysToBeRemoved) {
-                            // set to height of 0
-                            createCylinder(key, null, null, 0, null)
-                        }
-
-                        const newKeys = _.difference(Object.keys(changedCylinders), Object.keys(cylinderCache));
-                        for (const key of newKeys) {
-                            demoSettings.data.cylinders.add(changedCylinders[key]);
-                        }
-
+                        demoSettings.data.max = demoSettings.data.stoof[demoSettings.data.hour][0][demoSettings.data.metric];
+                        const changedCylinders = modelDataAsCylinders(demoSettings.data.stoof, demoSettings.data.max, demoSettings.data.hour);
+                        refreshCylinders(changedCylinders);
                     }
 
                     function createLight(demoSettings) {
@@ -497,23 +484,36 @@
                         app.view.scene.add(globe);
                         loadDruidData(demoSettings);
 
+                        demoSettings.data.cylinders = new THREE.Group();
+                        app.view.scene.add(demoSettings.data.cylinders);
+
                         return {
                             camera : app.view.camera,
                             light : lightDirectional,
                             pointLights,
                             globe,
-                            model: modelGroup,
                         };
+                    }
+
+
+                    function refreshCylinders(newCylinders) {
+
+                        demoSettings.data.max = demoSettings.data.stoof[demoSettings.data.hour][0][demoSettings.data.metric];
+
+                        const keysToBeRemoved = _.difference(Object.keys(cylinderCache), Object.keys(newCylinders));
+                        for (const key of keysToBeRemoved) {
+                            // set to height of 0
+                            createCylinder(key, null, null, 0, null)
+                        }
+
+                        for (const cyl of Object.values(newCylinders)) {
+                            demoSettings.data.cylinders.add(cyl);
+                        }
                     }
 
                     function loadDruidData(demoSettings) {
                         const ironbarkService = new IronbarkService();
-
                         const coordsHelper = new CoordinatesHelper();
-
-                        const modelGroup = new THREE.Group();
-                        modelGroup.add(globe);
-                        app.view.scene.add(modelGroup);
 
                         ironbarkService.topN(demoSettings.data.metric, "2018-12-16", "2018-12-17", "hour").then(
                             (data) => data.map( (item) => coordsHelper.addLatLng(item.result)),
@@ -525,16 +525,18 @@
                                 return x;
                             })
 
-                            demoSettings.data.cylinders = new THREE.Group();
-                            modelGroup.add(demoSettings.data.cylinders);
-                            demoSettings.data.max = demoSettings.data.stoof[0][0][demoSettings.data.metric];
-                            modelDataAsCylinders(demoSettings.data.stoof, demoSettings.data.max, demoSettings.data.hour).forEach(c => demoSettings.data.cylinders.add(c));
-
-
+                            demoSettings.data.max = demoSettings.data.stoof[demoSettings.data.hour][0][demoSettings.data.metric];
+                            const newCyls = modelDataAsCylinders(demoSettings.data.stoof, demoSettings.data.max, demoSettings.data.hour);
+                            refreshCylinders(newCyls);
                         });
                     }
 
                     var demoObjects = createScene(demoSettings);
+                    demoObjects.globe.rotation.setFromVector3(new THREE.Vector3(
+                            THREE.Math.degToRad(0),
+                            THREE.Math.degToRad(180),
+                            THREE.Math.degToRad(0)
+                    ));
 
                     var loader = new THREE.ObjectLoader();
                     loader.load(
@@ -572,8 +574,6 @@
                         }
 
                         TWEEN.update();
-
-                        // demoObjects.model.rotateX(0.01);
 
                         demoObjects.light.position.copy( demoObjects.camera.position );
 
