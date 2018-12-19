@@ -583,13 +583,16 @@
                         }
                     );
 
+                    var x = 40;
+
                     app.view.onUpdate( function() {
 
                         if(demoObjects.tardis) {
-                            demoObjects.tardis.translateX(40)
+                            demoObjects.tardis.translateX(x)
                             demoObjects.tardis.rotateY(0.01);
-                            demoObjects.tardis.translateX(-40)
+                            demoObjects.tardis.translateX(-x)
                         }
+                        x+=0.02
 
                         TWEEN.update();
 
