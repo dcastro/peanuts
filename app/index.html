@@ -415,6 +415,9 @@
                         app.datGui.add(demoSettings.data, "autoplay", false);
                         app.datGui.add(demoSettings.data, "enable_glitch", false).onChange(x => {
                             app.view.setComposer(x ? demoObjects.composer : null);
+                            demoObjects.tardis.visible = x;
+                            demoObjects.tardis.position.set(0.3,0.3,0.3)
+                            demoObjects.tardis.translateX(-40)
                         })
 
                         app.datGui.add(demoSettings.data, 'metric', ['calls', 'count', 'impressions', 'completedViews', 'clicks', 'payout'])
@@ -569,6 +572,7 @@
                             //obj.translateY(30)
                             obj.translateX(-40)
                             demoObjects.tardis = obj;
+                            demoObjects.tardis.visible = false;
                             app.view.scene.add( obj );
                         },
 
