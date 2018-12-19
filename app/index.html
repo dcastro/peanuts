@@ -77,14 +77,54 @@
             height: 100%;
             width: 100%;
         }
+
+        #slidecontainer {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 15px;
+            border-radius: 5px;
+            background: #d3d3d3;
+            outline: none;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+        }
+
     </style>
 
 </head>
 
     <body>
 
-
-            <div id="app" class="threeApp"></div>
+            <div id="app" class="threeApp">
+                <div id="slidecontainer">
+                    <input type="range" min="0" max="23" value="0" class="slider" id="hourRange">
+                </div>
+            </div>
 
             <script type="text/javascript">
 
@@ -122,6 +162,7 @@
                             glitch: 0,
                             hour: 0,
                             max: 1,
+                            metric: 'calls',
                             stoof: [],
                             cylinders: []
                         },
@@ -222,7 +263,7 @@
                                 0,
                                 2 * Math.PI
                             );
-                            
+
 
                     function createCylinder(key, lat, lng, height, color, width) {
                         if (!cylinderCache[key]) {
@@ -243,7 +284,7 @@
                                 
                             cylinderCache[key] = cylinderMesh;
                         }
-                        
+
                         new TWEEN.Tween(cylinderCache[key].userData.currentHeight || { height: 0 })
                             .to({height: height * 10 }, 500)
                             .onUpdate(function(){
@@ -359,10 +400,12 @@
                         let cylinders = new Array();
 
                         data[hour].map((item) => {
-                            const normalizedValue = item.calls / max;
-                            const color = Math.round((item.calls / max) * 255)
+                            const metric = demoSettings.data.metric;
+
+                            const normalizedValue = item[metric] / max;
+                            const color = Math.round((item[metric] / max) * 255)
                             const colorRgb = new THREE.Color(`rgb(${color},${255 - color},0)`)
-                            cylinders[item.targets_geo_city] = 
+                            cylinders[item.targets_geo_city] =
                                 createCylinder(item.targets_geo_city, item.lat, item.lng, normalizedValue, colorRgb);
 
                         })
@@ -371,25 +414,32 @@
 
                     function createControls(demoSettings) {
                         app.datGui.add(demoSettings.data, "glitch", 0, 1000);
-                        app.datGui.add(demoSettings.data, "hour", 0, 23)
+
+                        app.datGui.add(demoSettings.data, 'metric', ['calls', 'count', 'impressions', 'completedViews', 'clicks', 'payout'])
                             .onChange(x => {
-                                demoSettings.data.max = demoSettings.data.stoof[x][0].calls;
-
-                                const changedCylinders = modelDataAsCylinders(demoSettings.data.stoof, demoSettings.data.max, x);
-
-                                const keysToBeRemoved = _.difference(Object.keys(cylinderCache), Object.keys(changedCylinders));
-                                for (const key of keysToBeRemoved) {
-                                    // set to height of 0
-                                    createCylinder(key, null, null, 0, null)
-                                }
-
-                                const newKeys = _.difference(Object.keys(changedCylinders), Object.keys(cylinderCache));
-                                for (const key of newKeys) {
-                                    demoSettings.data.cylinders.add(changedCylinders[key]);
-                                }
-
+                                loadDruidData(demoSettings);
                             })
                             .step(1)
+                    }
+
+                    document.getElementById('hourRange').oninput = function() {
+                        const newHour = this.value;
+
+                        demoSettings.data.max = demoSettings.data.stoof[newHour][0].calls;
+
+                        const changedCylinders = modelDataAsCylinders(demoSettings.data.stoof, demoSettings.data.max, newHour);
+
+                        const keysToBeRemoved = _.difference(Object.keys(cylinderCache), Object.keys(changedCylinders));
+                        for (const key of keysToBeRemoved) {
+                            // set to height of 0
+                            createCylinder(key, null, null, 0, null)
+                        }
+
+                        const newKeys = _.difference(Object.keys(changedCylinders), Object.keys(cylinderCache));
+                        for (const key of newKeys) {
+                            demoSettings.data.cylinders.add(changedCylinders[key]);
+                        }
+
                     }
 
                     function createLight(demoSettings) {
@@ -444,34 +494,8 @@
                         createControls(demoSettings);
                         const {lightDirectional, pointLights, ...rest} = createLight(demoSettings);
 
-                        var ironbarkService = new IronbarkService();
-
-                        const coordsHelper = new CoordinatesHelper();
-
-                        const modelGroup = new THREE.Group();
-                        modelGroup.add(globe);
-                        app.view.scene.add(modelGroup);
-
-                        ironbarkService.topN("calls", "2018-12-16", "2018-12-17", "hour").then(
-                            (data) => data.map( (item) => coordsHelper.addLatLng(item.result)),
-                            ex => console.log(ex)
-                        ).then( (data) => {
-
-                            demoSettings.data.stoof = data.map(x => {
-                                x.splice(0,2)
-                                return x;
-                            })
-
-                          /*  const lights = demoSettings.data.stoof[0].slice(1, 10);
-                            lights.map((item) => {
-                                app.view.scene.add(createPointLight(calcPosFromLatLonRad(item.lat, item.lng, demoSettings.globe.geometry.radius + 1)));
-                            }); */
-
-                            demoSettings.data.cylinders = new THREE.Group();
-                            modelGroup.add(demoSettings.data.cylinders);
-                            demoSettings.data.max = demoSettings.data.stoof[0][0].calls;
-                            modelDataAsCylinders(demoSettings.data.stoof, demoSettings.data.max, demoSettings.data.hour).forEach(c => demoSettings.data.cylinders.add(c));
-                        });
+                        app.view.scene.add(globe);
+                        loadDruidData(demoSettings);
 
                         return {
                             camera : app.view.camera,
@@ -482,15 +506,71 @@
                         };
                     }
 
-                    var demoObjects = createScene(demoSettings);
-                    demoObjects.globe.rotation.setFromVector3(new THREE.Vector3(
-                            THREE.Math.degToRad(0),
-                            THREE.Math.degToRad(180),
-                            THREE.Math.degToRad(0)
-                    ));
+                    function loadDruidData(demoSettings) {
+                        const ironbarkService = new IronbarkService();
 
+                        const coordsHelper = new CoordinatesHelper();
+
+                        const modelGroup = new THREE.Group();
+                        modelGroup.add(globe);
+                        app.view.scene.add(modelGroup);
+
+                        ironbarkService.topN(demoSettings.data.metric, "2018-12-16", "2018-12-17", "hour").then(
+                            (data) => data.map( (item) => coordsHelper.addLatLng(item.result)),
+                            ex => console.log(ex)
+                        ).then( (data) => {
+
+                            demoSettings.data.stoof = data.map(x => {
+                                x.splice(0,2)
+                                return x;
+                            })
+
+                            demoSettings.data.cylinders = new THREE.Group();
+                            modelGroup.add(demoSettings.data.cylinders);
+                            demoSettings.data.max = demoSettings.data.stoof[0][0][demoSettings.data.metric];
+                            modelDataAsCylinders(demoSettings.data.stoof, demoSettings.data.max, demoSettings.data.hour).forEach(c => demoSettings.data.cylinders.add(c));
+
+
+                        });
+                    }
+
+                    var demoObjects = createScene(demoSettings);
+
+                    var loader = new THREE.ObjectLoader();
+                    loader.load(
+                        // resource URL
+                        "/assets/sprites/tardis/tardis.json",
+
+                        // onLoad callback
+                        // Here the loaded data is assumed to be an object
+                        function ( obj ) {
+                            // Add the loaded object to the scene
+                            obj.scale.set(0.3,0.3,0.3)
+                            //obj.translateY(30)
+                            obj.translateX(-40)
+                            demoObjects.tardis = obj;
+                            app.view.scene.add( obj );
+                        },
+
+                        // onProgress callback
+                        function ( xhr ) {
+                            console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+                        },
+
+                        // onError callback
+                        function ( err ) {
+                            console.error( 'An error happened' );
+                        }
+                    );
 
                     app.view.onUpdate( function() {
+
+                        if(demoObjects.tardis) {
+                            demoObjects.tardis.translateX(40)
+                            demoObjects.tardis.rotateY(0.01);
+                            demoObjects.tardis.translateX(-40)
+                        }
+
                         TWEEN.update();
 
                         // demoObjects.model.rotateX(0.01);
@@ -508,6 +588,7 @@
                             );
                         }
                     });
+
 
                     app.start();
 
