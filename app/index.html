@@ -159,6 +159,8 @@
 
                     var demoSettings =  {
                         data: {
+                            autoplay: false,
+                            enable_glitch: false,
                             glitch: 0,
                             hour: 0,
                             max: 1,
@@ -285,7 +287,7 @@
                         }
 
                         new TWEEN.Tween(cylinderCache[key].userData.currentHeight || { height: 0 })
-                            .to({height: height * 20 }, 500)
+                            .to({height: height * 20 }, 100)
                             .onUpdate(function(){
                                 cylinderCache[key].position.set(0, 0, 0);
                                 cylinderCache[key].translateY(22 + this._object.height);
@@ -346,10 +348,7 @@
 
 
                     function createPostProcessing(demoSettings) {
-
-                        // postprocessing
                         var composer = new THREE.EffectComposer(app.renderer);
-                         
                         var dotscreen = new THREE.ShaderPass(THREE.DotScreenShader);
                             dotscreen.uniforms['scale'].value = 40;
                             dotscreen.renderToScreen = true;
@@ -374,7 +373,7 @@
                          composer.addPass(glitch);
                         // composer.addPass(sobel_pass);
  
-                        app.view.setComposer(composer);
+                        return composer;
                     }
 
                     function createSkyBox(demoSettings) {
@@ -413,7 +412,10 @@
                     }
 
                     function createControls(demoSettings) {
-                        app.datGui.add(demoSettings.data, "glitch", 0, 1000);
+                        app.datGui.add(demoSettings.data, "autoplay", false);
+                        app.datGui.add(demoSettings.data, "enable_glitch", false).onChange(x => {
+                            app.view.setComposer(x ? demoObjects.composer : null);
+                        })
 
                         app.datGui.add(demoSettings.data, 'metric', ['calls', 'count', 'impressions', 'completedViews', 'clicks', 'payout'])
                             .onChange(x => {
@@ -422,14 +424,21 @@
                     }
 
 
-
+                    setInterval(() => {
+                        if (demoSettings.data.autoplay) {
+                            document.getElementById('hourRange').value = (demoSettings.data.hour + 1) % 23;
+                            onHourChanged((demoSettings.data.hour + 1) % 23);
+                        }
+                    }, 100)
 
                     function onHourChanged(newHour) {
                         demoSettings.data.hour = newHour
 
-                        demoSettings.data.max = demoSettings.data.stoof[demoSettings.data.hour][0][demoSettings.data.metric];
-                        const changedCylinders = modelDataAsCylinders(demoSettings.data.stoof, demoSettings.data.max, demoSettings.data.hour);
-                        refreshCylinders(changedCylinders);
+                        if (demoSettings.data.stoof.length > 0) {
+                            demoSettings.data.max = demoSettings.data.stoof[demoSettings.data.hour][0][demoSettings.data.metric];
+                            const changedCylinders = modelDataAsCylinders(demoSettings.data.stoof, demoSettings.data.max, demoSettings.data.hour);
+                            refreshCylinders(changedCylinders);
+                        }
 
                     }
 
@@ -540,6 +549,7 @@
                     }
 
                     var demoObjects = createScene(demoSettings);
+                    demoObjects.composer = createPostProcessing(demoSettings);
                     demoObjects.globe.rotation.setFromVector3(new THREE.Vector3(
                             THREE.Math.degToRad(0),
                             THREE.Math.degToRad(180),
