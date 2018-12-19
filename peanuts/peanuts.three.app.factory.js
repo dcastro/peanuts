@@ -20,7 +20,7 @@ Peanuts.Three.App.Factory = function (Peanuts) {
             .withPerspectiveView()
             .withBasicAssetManager()
             .withDatGui()
-            .withStats()
+            //.withStats()
             .build();
 
         return app;

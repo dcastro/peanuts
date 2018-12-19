@@ -10,13 +10,13 @@
     
     <script src="/assets/scripts/codePrinter.js"></script>
 
-    <script src="/deps/papaparse/papaparse.js"></script>
     <script src="/deps/lodash/lodash.js"></script>
     <script src="/assets/geo/geo-data.js"></script>
     <script src="/coordinatesHelper.js"></script>
     <script src="/ironbarkService.js"></script>
 
     <script src="/threex.atmospherematerial.js"></script>
+    <script src="/tween.js"></script>
 
     <script src="/deps/highlightjs/highlight.pack.min.js"></script>
     <script src="/deps/dat.gui/build/dat.gui.min.js"></script>
@@ -212,19 +212,20 @@
                         return {atmosphere1, atmosphere2};
                     }
 
-
-                    function createCylinder(key, lat, lng, height, color, width) {
-                        if (!cylinderCache[key]) {
-                            var cylinderGeometry = new THREE.CylinderBufferGeometry(
+                    var cylinderGeometry = new THREE.CylinderBufferGeometry(
                                 0.1,
                                 0.1,
-                                10,
+                                9.99,
                                 10,
                                 1,
                                 false,
                                 0,
                                 2 * Math.PI
                             );
+                            
+
+                    function createCylinder(key, lat, lng, height, color, width) {
+                        if (!cylinderCache[key]) {
                             var cylinderMaterial = new THREE.MeshBasicMaterial({
                                 wireframe: false,
                                 color: color
@@ -242,12 +243,16 @@
                                 
                             cylinderCache[key] = cylinderMesh;
                         }
+                        
+                        new TWEEN.Tween(cylinderCache[key].userData.currentHeight || { height: 0 })
+                            .to({height: height * 10 }, 500)
+                            .onUpdate(function(){
+                                cylinderCache[key].position.set(0, 0, 0);
+                                cylinderCache[key].translateY(27 + this._object.height);
+                                cylinderCache[key].userData.currentHeight = {height: this._object.height};
+                            })
+                            .start();
 
-                        cylinderCache[key].position.set(0, 0, 0);
-                        cylinderCache[key].translateY(5);
-                        cylinderCache[key].translateY(22);
-                        cylinderCache[key].translateY(height * 10);
-             
                         return cylinderCache[key];
                     }
 
@@ -351,15 +356,14 @@
                     }
 
                     function modelDataAsCylinders(data, max, hour){
-                        let cylinders = new THREE.Group();
+                        let cylinders = new Array();
 
                         data[hour].map((item) => {
                             const normalizedValue = item.calls / max;
                             const color = Math.round((item.calls / max) * 255)
                             const colorRgb = new THREE.Color(`rgb(${color},${255 - color},0)`)
-                            cylinders.add(
-                                createCylinder(item.targets_geo_city, item.lat, item.lng, normalizedValue, colorRgb)
-                            );
+                            cylinders[item.targets_geo_city] = 
+                                createCylinder(item.targets_geo_city, item.lat, item.lng, normalizedValue, colorRgb);
 
                         })
                         return cylinders;
@@ -369,10 +373,20 @@
                         app.datGui.add(demoSettings.data, "glitch", 0, 1000);
                         app.datGui.add(demoSettings.data, "hour", 0, 23)
                             .onChange(x => {
+                                demoSettings.data.max = demoSettings.data.stoof[x][0].calls;
 
-                                demoObjects.model.remove(demoSettings.data.cylinders);
-                                demoSettings.data.cylinders = modelDataAsCylinders(demoSettings.data.stoof, demoSettings.data.max, x)
-                                demoObjects.model.add(demoSettings.data.cylinders);
+                                const changedCylinders = modelDataAsCylinders(demoSettings.data.stoof, demoSettings.data.max, x);
+
+                                const keysToBeRemoved = _.difference(Object.keys(cylinderCache), Object.keys(changedCylinders));
+                                for (const key of keysToBeRemoved) {
+                                    // set to height of 0
+                                    createCylinder(key, null, null, 0, null)
+                                }
+
+                                const newKeys = _.difference(Object.keys(changedCylinders), Object.keys(cylinderCache));
+                                for (const key of newKeys) {
+                                    demoSettings.data.cylinders.add(changedCylinders[key]);
+                                }
 
                             })
                             .step(1)
@@ -453,11 +467,10 @@
                                 app.view.scene.add(createPointLight(calcPosFromLatLonRad(item.lat, item.lng, demoSettings.globe.geometry.radius + 1)));
                             }); */
 
-                            demoSettings.data.max = demoSettings.data.stoof[0][0].calls;
-
-                            demoSettings.data.cylinders = modelDataAsCylinders(demoSettings.data.stoof, demoSettings.data.max, demoSettings.data.hour)
+                            demoSettings.data.cylinders = new THREE.Group();
                             modelGroup.add(demoSettings.data.cylinders);
-
+                            demoSettings.data.max = demoSettings.data.stoof[0][0].calls;
+                            modelDataAsCylinders(demoSettings.data.stoof, demoSettings.data.max, demoSettings.data.hour).forEach(c => demoSettings.data.cylinders.add(c));
                         });
 
                         return {
@@ -478,14 +491,13 @@
 
 
                     app.view.onUpdate( function() {
+                        TWEEN.update();
 
-                        demoObjects.model.rotateX(0.01);
+                        // demoObjects.model.rotateX(0.01);
 
-                        //demoObjects.light.position.set(new THREE.Vector3(-55,50,-60));
                         demoObjects.light.position.copy( demoObjects.camera.position );
 
 
-                        var delta = clock.getDelta();
                         var time = Date.now() * 0.0004;
 
                         for ( var i = 1, il = demoObjects.pointLights.length; i <= il; i ++ ) {
