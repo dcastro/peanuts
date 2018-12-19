@@ -256,7 +256,7 @@
                     var cylinderGeometry = new THREE.CylinderBufferGeometry(
                                 0.1,
                                 0.1,
-                                9.99,
+                                19.99,
                                 6,
                                 1,
                                 false,
@@ -265,11 +265,10 @@
                             );
 
 
-                    function createCylinder(key, lat, lng, height, color, width) {
+                    function createCylinder(key, lat, lng, height, width) {
                         if (!cylinderCache[key]) {
                             var cylinderMaterial = new THREE.MeshBasicMaterial({
-                                wireframe: false,
-                                color: color
+                                wireframe: false
                             });
                             var cylinderMesh = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
 
@@ -286,11 +285,14 @@
                         }
 
                         new TWEEN.Tween(cylinderCache[key].userData.currentHeight || { height: 0 })
-                            .to({height: height * 10 }, 500)
+                            .to({height: height * 20 }, 500)
                             .onUpdate(function(){
                                 cylinderCache[key].position.set(0, 0, 0);
-                                cylinderCache[key].translateY(27 + this._object.height);
+                                cylinderCache[key].translateY(22 + this._object.height);
                                 cylinderCache[key].userData.currentHeight = {height: this._object.height};
+
+                                const normHeight = this._object.height / 20.0;
+                                cylinderCache[key].material.color = new THREE.Color(normHeight, 1 - normHeight, 0);
                             })
                             .start();
 
@@ -403,10 +405,8 @@
                             const metric = demoSettings.data.metric;
 
                             const normalizedValue = item[metric] / max;
-                            const color = Math.round((item[metric] / max) * 255)
-                            const colorRgb = new THREE.Color(`rgb(${color},${255 - color},0)`)
                             cylinders[item.targets_geo_city] =
-                                createCylinder(item.targets_geo_city, item.lat, item.lng, normalizedValue, colorRgb);
+                                createCylinder(item.targets_geo_city, item.lat, item.lng, normalizedValue);
 
                         })
                         return cylinders;
@@ -421,12 +421,20 @@
                             });
                     }
 
-                    document.getElementById('hourRange').oninput = function() {
-                        demoSettings.data.hour = this.value
+
+
+
+                    function onHourChanged(newHour) {
+                        demoSettings.data.hour = newHour
 
                         demoSettings.data.max = demoSettings.data.stoof[demoSettings.data.hour][0][demoSettings.data.metric];
                         const changedCylinders = modelDataAsCylinders(demoSettings.data.stoof, demoSettings.data.max, demoSettings.data.hour);
                         refreshCylinders(changedCylinders);
+
+                    }
+
+                    document.getElementById('hourRange').oninput = function() {
+                        onHourChanged(this.value);
                     }
 
                     function createLight(demoSettings) {
@@ -503,7 +511,7 @@
                         const keysToBeRemoved = _.difference(Object.keys(cylinderCache), Object.keys(newCylinders));
                         for (const key of keysToBeRemoved) {
                             // set to height of 0
-                            createCylinder(key, null, null, 0, null)
+                            createCylinder(key, null, null, 0)
                         }
 
                         for (const cyl of Object.values(newCylinders)) {
